@@ -117,6 +117,13 @@ cd tw-jobs-mcp
 claude mcp add tw-jobs -- uv run --project "$PWD" tw-jobs-mcp
 ```
 
+## Agent skill
+
+伺服器本身已經會告訴模型怎麼用。[`skills/tw-jobs`](skills/tw-jobs/SKILL.md) 這個 skill 給會載入 skill 的 agent 更進一步的指引：如何把白話需求轉成參數、怎麼挑來源、怎麼解讀註記、回報時該守的分寸。格式遵循開放的 Agent Skills 規格。
+
+- **Claude Code**：安裝外掛（同時帶入伺服器與 skill）：`/plugin marketplace add HsuanC0921/tw-jobs-mcp`，再 `/plugin install tw-jobs@tw-jobs-mcp`。或把 `skills/tw-jobs` 複製到 `~/.claude/skills/`。
+- **Codex 與其他支援 skill 的 agent**：把 `skills/tw-jobs` 複製到 `~/.agents/skills/`（或專案內的 `.agents/skills/`）。
+
 ## 工具
 
 | 工具 | 用途 |
@@ -152,7 +159,7 @@ claude mcp add tw-jobs -- uv run --project "$PWD" tw-jobs-mcp
 | `104`（預設） | 台灣最大人力銀行 | 全部 |
 | `yourator` | 新創、外商據點 | `keyword`、`area`、`sort=newest` |
 | `boards` | 外商 Greenhouse／Lever 職缺板上的台灣職缺 | `keyword`、`area`、`remote_only` |
-| `workday` | 約 20 家大型外商在 Workday 上的台灣職缺 | `keyword`、`area` |
+| `workday` | 38 家外商在 Workday 上的台灣職缺，從晶片、硬體到藥廠與金融 | `keyword`、`area` |
 | `all` | 以上四者交錯合併 | 依各來源；某個來源失敗只會在註記中說明，不影響其他來源 |
 
 來源不支援的條件會列在表格下方的 `註：…未套用`，不會默默忽略。`salary_overview` 與 `lookup_code` 只支援 104。

@@ -37,6 +37,23 @@ DEFAULT_COMPANIES = {
     "philips": ("wd3", "jobs-and-careers", "Philips"),
     "gsk": ("wd5", "GSKCareers", "GSK"),
     "novartis": ("wd3", "Novartis_Careers", "Novartis"),
+    "monolithicpower": ("wd12", "MPS_Careers", "Monolithic Power Systems"),
+    "zeissgroup": ("wd3", "External", "ZEISS"),
+    "globalfoundries": ("wd1", "external", "GlobalFoundries"),
+    "flextronics": ("wd1", "Careers", "Flex"),
+    "3m": ("wd1", "Search", "3M"),
+    "airliquidehr": ("wd3", "AirLiquideExternalCareer", "Air Liquide"),
+    "carrier": ("wd5", "jobs", "Carrier"),
+    "wnc": ("wd3", "WNC_External", "WNC"),
+    "stryker": ("wd1", "StrykerCareers", "Stryker"),
+    "bdx": ("wd1", "external_career_site_taiwan", "BD"),
+    "msd": ("wd5", "SearchJobs", "MSD"),
+    "sanofi": ("wd3", "SanofiCareers", "Sanofi"),
+    "citi": ("wd5", "2", "Citi"),
+    "prudential": ("wd3", "prudential", "Prudential"),
+    "pwc": ("wd3", "Global_Campus_Careers", "PwC"),
+    "jll": ("wd1", "jllcareers", "JLL"),
+    "circle": ("wd1", "circle", "Circle"),
 }
 PAGE = 20  # the most Workday returns per request
 DEPTH = 60  # rows read per company per search; deeper pages are not reachable
@@ -155,7 +172,7 @@ def search(*, keyword: str, areas: list[str], page: int, per_page: int,
         except (http.SiteError, KeyError, TypeError) as exc:
             return ([], 0), f"w:{tenant}：{exc}"
 
-    with ThreadPoolExecutor(max_workers=8) as pool:
+    with ThreadPoolExecutor(max_workers=12) as pool:
         loaded = list(pool.map(load, tenants))
     notes = [n for _, n in loaded if n]
     total = sum(t for (_, t), _ in loaded)

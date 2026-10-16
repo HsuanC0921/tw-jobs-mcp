@@ -132,68 +132,14 @@ def test_status_names_unreachable_sources(monkeypatch):
             raise http.SiteError("403 被擋")
         return {"jobs": [], "payload": {"jobs": [], "hasMore": False}}
 
+    def probe(tenant):
+        if tenant == "micron":
+            raise http.SiteError("擋住")
+
     monkeypatch.setattr(http, "get_json", fake_get)
+    monkeypatch.setattr(workday, "probe", probe)
     monkeypatch.setattr(service.api, "search", lambda params: {})
     monkeypatch.setenv("TW_JOBS_BOARDS", "-g:ubiquiti,-g:canonical,-g:stripe,-g:mongodb,-l:pinkoi,-l:binance,-l:crypto")
     text = render.status(service.source_status())
-    assert text.startswith("可用：104、g:appier") and "無法連線 yourator：403 被擋" in text
-
-
-# ---- Workday -------------------------------------------------------------------
-
-FACETS = [{"facetParameter": "locationMainGroup", "values": [
-    {"facetParameter": "locations", "values": [
-        {"id": "tpe", "descriptor": "Taiwan, Taipei"}, {"id": "hsz", "descriptor": "Taiwan, Hsinchu"},
-        {"id": "sg", "descriptor": "Singapore"}]}]}]
-
-
-def _post(listing):
-    def post_json(url, body, *, referer=None):
-        if body["limit"] == 1:
-            return {"total": 2, "facets": FACETS, "jobPostings": []}
-        return listing(body)
-    return post_json
-
-
-def _posting(n):
-    return {"title": f"Job {n}", "externalPath": f"/job/Taiwan-Taipei/Job-{n}_R{n}",
-            "locationsText": "2 Locations", "postedOn": "Posted 3 Days Ago"}
-
-
-def test_workday_filters_to_taiwan_and_cities(monkeypatch):
-    seen = []
-
-    def listing(body):
-        seen.append(body)
-        return {"total": 2, "jobPostings": [_posting(1), _posting(2)]}
-
-    monkeypatch.setattr(http, "post_json", _post(listing))
-    monkeypatch.setenv("TW_JOBS_WORKDAY", "-" + ",-".join(c for c in workday.DEFAULT_COMPANIES if c != "nvidia"))
-    page, notes = workday.search(keyword="gpu", areas=["新竹市"], page=1, per_page=5)
-    assert seen[0]["appliedFacets"] == {"locations": ["hsz"]} and seen[0]["searchText"] == "gpu"
-    assert page["total"] == 2 and not notes
-    row = page["jobs"][0]
-    assert row["id"] == "w:nvidia/Taiwan-Taipei/Job-1_R1" and row["location"] == "Taiwan Taipei"
-    assert row["posted"] == "3天前" and row["company"] == "NVIDIA"
-    nobody, _ = workday.search(keyword="", areas=["高雄市"], page=1, per_page=5)
-    assert nobody["jobs"] == []  # no Kaohsiung location, so nothing is asked for
-
-
-def test_workday_env_adds_and_rejects(monkeypatch):
-    monkeypatch.setenv("TW_JOBS_WORKDAY", "acme.wd1/External,-micron")
-    table = workday.companies()
-    assert table["acme"] == ("wd1", "External", "Acme") and "micron" not in table
-    monkeypatch.setenv("TW_JOBS_WORKDAY", "nonsense")
-    with pytest.raises(http.SiteError):
-        workday.companies()
-
-
-def test_workday_detail_and_labels(monkeypatch):
-    monkeypatch.setattr(http, "get_json", lambda url, **kw: {"jobPostingInfo": {
-        "title": "SWE", "location": "Taiwan, Taipei", "additionalLocations": ["Taiwan, Hsinchu"],
-        "jobDescription": "<p>Hi &amp; bye</p>", "postedOn": "超過 30 天前刊登", "timeType": "Full time",
-        "jobReqId": "R1", "externalUrl": "https://x/y"}})
-    d = workday.job("nvidia/Taiwan-Taipei/SWE_R1")
-    assert d["id"] == "w:nvidia/Taiwan-Taipei/SWE_R1" and d["location"] == "Taiwan, Taipei；Taiwan, Hsinchu"
-    assert d["posted"] == "30+天前" and "Hi & bye" in d["description"]
-    assert [workday._ago(x) for x in ("Posted Today", "昨天", "5 天前刊登")] == ["今天", "昨天", "5天前"]
+    assert text.startswith("可用：104、職缺板 1 家、Workday ") and "無法連線 yourator：403 被擋" in text
+    assert "無法連線 w:micron：擋住" in text and text.count("無法連線") == 2

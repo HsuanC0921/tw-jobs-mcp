@@ -1,0 +1,12 @@
+{
+  "name": "tw-jobs-mcp",
+  "owner": { "name": "HsuanC0921" },
+  "metadata": { "description": "Taiwan job search for AI agents." },
+  "plugins": [
+    {
+      "name": "tw-jobs",
+      "source": "./",
+      "description": "Taiwan job search: MCP server plus a skill for plain-language requests."
+    }
+  ]
+}

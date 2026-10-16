@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+- Agent skill: `skills/tw-jobs` teaches skill-aware agents (Claude Code, Codex and others using the Agent Skills format) to turn a plain request into precise arguments, pick a source, read the notes and report honestly. Also installable as a Claude Code plugin that bundles the server and the skill. 新增 agent skill 與 Claude Code 外掛。
+- Workday now covers 38 foreign employers (was 21): Monolithic Power Systems, ZEISS, GlobalFoundries, Flex, 3M, Air Liquide, Carrier, WNC, Stryker, BD, MSD, Sanofi, Citi, Prudential, PwC, JLL and Circle join the list. Companies without a reachable Workday site (for example AMD, Synopsys, Arm) are not included. Workday 來源擴充到 38 家。
+- `sources` summarizes the long list of career sites by count and names only the ones that are down.
+
 ## 1.0.0
 
 First release. 首次發佈。

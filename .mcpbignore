@@ -9,3 +9,6 @@ __pycache__
 *.pyc
 .pytest_cache
 *.mcpb
+skills
+.claude-plugin
+.mcp.json

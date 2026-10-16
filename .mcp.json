@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "tw-jobs": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/HsuanC0921/tw-jobs-mcp", "tw-jobs-mcp"]
+    }
+  }
+}

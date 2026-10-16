@@ -112,7 +112,11 @@ def codes(found: list[dict]) -> str:
 def status(d: dict) -> str:
     bad = [s for s in d["sources"] if s["error"]]
     good = [s["name"] for s in d["sources"] if not s["error"]]
-    lines = ["可用：" + "、".join(good) if good else "沒有可用的來源"]
+    # career sites come by the dozen; name only the main sources and count the rest
+    boards = sum(n[:2] in ("g:", "l:") for n in good)
+    workday = sum(n.startswith("w:") for n in good)
+    shown = [n for n in good if ":" not in n] + [f"職缺板 {boards} 家"] * bool(boards) + [f"Workday {workday} 家"] * bool(workday)
+    lines = ["可用：" + "、".join(shown) if good else "沒有可用的來源"]
     lines += [f"無法連線 {s['name']}：{_t(s['error'])[:120]}" for s in bad]
     return "\n".join(lines)
 

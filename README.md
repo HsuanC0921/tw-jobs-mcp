@@ -117,6 +117,13 @@ cd tw-jobs-mcp
 claude mcp add tw-jobs -- uv run --project "$PWD" tw-jobs-mcp
 ```
 
+## Agent skill
+
+The server already tells a model how to use it. The skill in [`skills/tw-jobs`](skills/tw-jobs/SKILL.md) goes further for agents that load skills: how to turn a plain request into arguments, which source to pick, how to read the notes, and what to report. It follows the open Agent Skills format.
+
+- **Claude Code**: install the plugin, which bundles the server and the skill: `/plugin marketplace add HsuanC0921/tw-jobs-mcp`, then `/plugin install tw-jobs@tw-jobs-mcp`. Or copy `skills/tw-jobs` to `~/.claude/skills/`.
+- **Codex and other skill-aware agents**: copy `skills/tw-jobs` to `~/.agents/skills/` (or `.agents/skills/` in a repository).
+
 ## Tools
 
 | Tool | What it does |
@@ -152,7 +159,7 @@ claude mcp add tw-jobs -- uv run --project "$PWD" tw-jobs-mcp
 | `104` (default) | Taiwan's largest board | all of them |
 | `yourator` | Start-ups, foreign-company offices | `keyword`, `area`, `sort=newest` |
 | `boards` | Taiwan roles on companies' own Greenhouse / Lever boards | `keyword`, `area`, `remote_only` |
-| `workday` | Taiwan roles at about 20 large foreign employers on Workday | `keyword`, `area` |
+| `workday` | Taiwan roles at 38 foreign employers on Workday, from chips and hardware to pharma and finance | `keyword`, `area` |
 | `all` | The four above, interleaved | per source; a failing source is reported, not fatal |
 
 Filters a source cannot apply are named in a `註：…未套用` line under the table, so nothing is silently ignored. `salary_overview` and `lookup_code` are 104-only.
