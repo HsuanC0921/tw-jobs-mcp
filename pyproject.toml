@@ -1,0 +1,30 @@
+[project]
+name = "tw-jobs-mcp"
+version = "1.0.0"
+description = "MCP server for searching Taiwan job boards (104, Yourator, foreign-company career boards) by Chinese area and job-category names"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [{ name = "HsuanC0921" }]
+keywords = ["mcp", "model-context-protocol", "taiwan", "jobs", "104"]
+dependencies = [
+    "mcp>=1.2.0,<2",  # 2.x dropped mcp.server.fastmcp
+    "curl_cffi>=0.7.0",
+]
+
+[project.scripts]
+tw-jobs-mcp = "tw_jobs_mcp.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tw_jobs_mcp"]
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+markers = ["live: talks to the real 104 site"]
+addopts = "-m 'not live'"

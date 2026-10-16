@@ -1,0 +1,11 @@
+.git
+.github
+.venv
+tests
+scripts
+Dockerfile
+.dockerignore
+__pycache__
+*.pyc
+.pytest_cache
+*.mcpb
