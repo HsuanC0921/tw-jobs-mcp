@@ -1,5 +1,7 @@
 # tw-jobs-mcp
 
+<!-- mcp-name: io.github.HsuanC0921/tw-jobs-mcp -->
+
 **English** · [繁體中文](https://github.com/HsuanC0921/tw-jobs-mcp/blob/main/README.zh-TW.md)
 
 [![test](https://github.com/HsuanC0921/tw-jobs-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/HsuanC0921/tw-jobs-mcp/actions/workflows/test.yml)

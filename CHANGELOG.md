@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2
+
+- Added `server.json` and the ownership marker the official MCP Registry needs. 加入 MCP 官方 Registry 所需的 `server.json` 與所有權標記。
+
 ## 1.1.1
 
 - Published on PyPI: install and run with `uvx tw-jobs-mcp`; the README commands no longer need a GitHub URL. Package metadata (links, classifiers) added. 上架 PyPI，安裝改用 `uvx tw-jobs-mcp`。

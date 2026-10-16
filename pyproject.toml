@@ -1,6 +1,6 @@
 [project]
 name = "tw-jobs-mcp"
-version = "1.1.1"
+version = "1.1.2"
 description = "MCP server for searching Taiwan job boards (104, Yourator, foreign-company career boards) by Chinese area and job-category names"
 readme = "README.md"
 requires-python = ">=3.11"

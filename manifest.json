@@ -2,7 +2,7 @@
   "manifest_version": "0.4",
   "name": "tw-jobs-mcp",
   "display_name": "Taiwan Jobs 台灣求職搜尋",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Search Taiwan jobs on 104, Yourator and foreign companies' career boards. 搜尋 104、Yourator 與外商職缺板的台灣職缺。",
   "long_description": "Read-only MCP server for Taiwan job postings: 104, Yourator, and foreign companies' own Greenhouse / Lever / Workday career sites. Filter by keyword, area, job category, salary, job type, remote, recency, years of experience and education; read full postings and company profiles; estimate salary ranges. No account or API key needed.\n\n唯讀的台灣求職搜尋，涵蓋 104、Yourator 與外商自家職缺板。可依關鍵字、地區、職類、薪資、工作性質、遠端、刊登時間、年資、學歷篩選，查看完整職缺與公司簡介，並估算薪資行情。不需要帳號或 API key。\n\nUnofficial, not affiliated with 104. 非官方工具，與 104 無關。",
   "author": { "name": "HsuanC0921", "url": "https://github.com/HsuanC0921" },

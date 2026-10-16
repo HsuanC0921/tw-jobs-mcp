@@ -38,3 +38,12 @@ def test_plugin_files_match_the_package_version():
     assert mcp["args"][-1] == "tw-jobs-mcp"
     market = json.loads((ROOT / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8"))
     assert market["plugins"][0]["name"] == plugin["name"]
+
+
+def test_registry_entry_matches_the_package():
+    entry = json.loads((ROOT / "server.json").read_text(encoding="utf-8"))
+    assert entry["version"] == __version__ and entry["packages"][0]["version"] == __version__
+    assert entry["packages"][0]["identifier"] == "tw-jobs-mcp" and len(entry["description"]) <= 100
+    assert re.fullmatch(r"io\.github\.[A-Za-z0-9-]+/[a-zA-Z0-9._-]+", entry["name"])
+    # the registry proves ownership by finding this exact line in the README shown on PyPI
+    assert f"mcp-name: {entry['name']}" in (ROOT / "README.md").read_text(encoding="utf-8")

@@ -9,3 +9,4 @@ __pycache__
 skills
 .claude-plugin
 .mcp.json
+server.json
