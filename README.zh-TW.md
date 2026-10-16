@@ -1,9 +1,9 @@
 # tw-jobs-mcp
 
-[English](README.md) · **繁體中文**
+[English](https://github.com/HsuanC0921/tw-jobs-mcp/blob/main/README.md) · **繁體中文**
 
 [![test](https://github.com/HsuanC0921/tw-jobs-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/HsuanC0921/tw-jobs-mcp/actions/workflows/test.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/HsuanC0921/tw-jobs-mcp/blob/main/LICENSE)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 ![MCP](https://img.shields.io/badge/MCP-stdio%20%7C%20streamable--http-green)
 
@@ -30,18 +30,18 @@
 
 ## 安裝
 
-需要先安裝 [uv](https://docs.astral.sh/uv/)。以下指令直接從 GitHub 執行，不會永久安裝任何東西。
+需要先安裝 [uv](https://docs.astral.sh/uv/)。以下指令從 [PyPI](https://pypi.org/project/tw-jobs-mcp/) 取得並執行，不會永久安裝。想試用尚未發布的程式碼，改用 `uvx --from git+https://github.com/HsuanC0921/tw-jobs-mcp tw-jobs-mcp`。
 
 ### Claude Code
 
 ```bash
-claude mcp add tw-jobs -s user -- uvx --from git+https://github.com/HsuanC0921/tw-jobs-mcp tw-jobs-mcp
+claude mcp add tw-jobs -s user -- uvx tw-jobs-mcp
 ```
 
 ### OpenAI Codex CLI
 
 ```bash
-codex mcp add tw-jobs -- uvx --from git+https://github.com/HsuanC0921/tw-jobs-mcp tw-jobs-mcp
+codex mcp add tw-jobs -- uvx tw-jobs-mcp
 ```
 
 或編輯 `~/.codex/config.toml`：
@@ -49,7 +49,7 @@ codex mcp add tw-jobs -- uvx --from git+https://github.com/HsuanC0921/tw-jobs-mc
 ```toml
 [mcp_servers.tw-jobs]
 command = "uvx"
-args = ["--from", "git+https://github.com/HsuanC0921/tw-jobs-mcp", "tw-jobs-mcp"]
+args = ["tw-jobs-mcp"]
 startup_timeout_sec = 60   # 第一次執行要下載相依套件
 ```
 
@@ -66,7 +66,7 @@ startup_timeout_sec = 60   # 第一次執行要下載相依套件
   "mcpServers": {
     "tw-jobs": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/HsuanC0921/tw-jobs-mcp", "tw-jobs-mcp"]
+      "args": ["tw-jobs-mcp"]
     }
   }
 }
@@ -82,7 +82,7 @@ startup_timeout_sec = 60   # 第一次執行要下載相依套件
     "tw-jobs": {
       "type": "stdio",
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/HsuanC0921/tw-jobs-mcp", "tw-jobs-mcp"]
+      "args": ["tw-jobs-mcp"]
     }
   }
 }
@@ -93,7 +93,7 @@ startup_timeout_sec = 60   # 第一次執行要下載相依套件
 給用網址連線的客戶端，或團隊共用一台 server：
 
 ```bash
-uvx --from git+https://github.com/HsuanC0921/tw-jobs-mcp tw-jobs-mcp --transport streamable-http --port 8000
+uvx tw-jobs-mcp --transport streamable-http --port 8000
 # 端點：http://127.0.0.1:8000/mcp
 ```
 
@@ -119,7 +119,7 @@ claude mcp add tw-jobs -- uv run --project "$PWD" tw-jobs-mcp
 
 ## Agent skill
 
-伺服器本身已經會告訴模型怎麼用。[`skills/tw-jobs`](skills/tw-jobs/SKILL.md) 這個 skill 給會載入 skill 的 agent 更進一步的指引：如何把白話需求轉成參數、怎麼挑來源、怎麼解讀註記、回報時該守的分寸。格式遵循開放的 Agent Skills 規格。
+伺服器本身已經會告訴模型怎麼用。[`skills/tw-jobs`](https://github.com/HsuanC0921/tw-jobs-mcp/blob/main/skills/tw-jobs/SKILL.md) 這個 skill 給會載入 skill 的 agent 更進一步的指引：如何把白話需求轉成參數、怎麼挑來源、怎麼解讀註記、回報時該守的分寸。格式遵循開放的 Agent Skills 規格。
 
 - **Claude Code**：安裝外掛（同時帶入伺服器與 skill）：`/plugin marketplace add HsuanC0921/tw-jobs-mcp`，再 `/plugin install tw-jobs@tw-jobs-mcp`。或把 `skills/tw-jobs` 複製到 `~/.claude/skills/`。
 - **Codex 與其他支援 skill 的 agent**：把 `skills/tw-jobs` 複製到 `~/.agents/skills/`（或專案內的 `.agents/skills/`）。
@@ -216,4 +216,4 @@ uv run python scripts/update_codes.py   # 更新地區與職類代碼表
 
 ## 授權
 
-[MIT](LICENSE)。依現狀提供，不附任何保證。
+[MIT](https://github.com/HsuanC0921/tw-jobs-mcp/blob/main/LICENSE)。依現狀提供，不附任何保證。

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- Published on PyPI: install and run with `uvx tw-jobs-mcp`; the README commands no longer need a GitHub URL. Package metadata (links, classifiers) added. 上架 PyPI，安裝改用 `uvx tw-jobs-mcp`。
+
 ## 1.1.0
 
 - Agent skill: `skills/tw-jobs` teaches skill-aware agents (Claude Code, Codex and others using the Agent Skills format) to turn a plain request into precise arguments, pick a source, read the notes and report honestly. Also installable as a Claude Code plugin that bundles the server and the skill. 新增 agent skill 與 Claude Code 外掛。

@@ -1,9 +1,9 @@
 # tw-jobs-mcp
 
-**English** · [繁體中文](README.zh-TW.md)
+**English** · [繁體中文](https://github.com/HsuanC0921/tw-jobs-mcp/blob/main/README.zh-TW.md)
 
 [![test](https://github.com/HsuanC0921/tw-jobs-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/HsuanC0921/tw-jobs-mcp/actions/workflows/test.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/HsuanC0921/tw-jobs-mcp/blob/main/LICENSE)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 ![MCP](https://img.shields.io/badge/MCP-stdio%20%7C%20streamable--http-green)
 
@@ -30,18 +30,18 @@ Write areas and job categories as plain Chinese names (`台北市大安區`, `�
 
 ## Install
 
-Requires [uv](https://docs.astral.sh/uv/). The commands below run the server straight from GitHub; nothing is installed permanently.
+Requires [uv](https://docs.astral.sh/uv/). The commands below fetch the server from [PyPI](https://pypi.org/project/tw-jobs-mcp/) and run it; nothing is installed permanently. To try the unreleased code instead, use `uvx --from git+https://github.com/HsuanC0921/tw-jobs-mcp tw-jobs-mcp`.
 
 ### Claude Code
 
 ```bash
-claude mcp add tw-jobs -s user -- uvx --from git+https://github.com/HsuanC0921/tw-jobs-mcp tw-jobs-mcp
+claude mcp add tw-jobs -s user -- uvx tw-jobs-mcp
 ```
 
 ### OpenAI Codex CLI
 
 ```bash
-codex mcp add tw-jobs -- uvx --from git+https://github.com/HsuanC0921/tw-jobs-mcp tw-jobs-mcp
+codex mcp add tw-jobs -- uvx tw-jobs-mcp
 ```
 
 or edit `~/.codex/config.toml`:
@@ -49,7 +49,7 @@ or edit `~/.codex/config.toml`:
 ```toml
 [mcp_servers.tw-jobs]
 command = "uvx"
-args = ["--from", "git+https://github.com/HsuanC0921/tw-jobs-mcp", "tw-jobs-mcp"]
+args = ["tw-jobs-mcp"]
 startup_timeout_sec = 60   # the first run downloads dependencies
 ```
 
@@ -66,7 +66,7 @@ Add to `~/.gemini/settings.json`, `~/.cursor/mcp.json` (or `.cursor/mcp.json`), 
   "mcpServers": {
     "tw-jobs": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/HsuanC0921/tw-jobs-mcp", "tw-jobs-mcp"]
+      "args": ["tw-jobs-mcp"]
     }
   }
 }
@@ -82,7 +82,7 @@ Add to `~/.gemini/settings.json`, `~/.cursor/mcp.json` (or `.cursor/mcp.json`), 
     "tw-jobs": {
       "type": "stdio",
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/HsuanC0921/tw-jobs-mcp", "tw-jobs-mcp"]
+      "args": ["tw-jobs-mcp"]
     }
   }
 }
@@ -93,7 +93,7 @@ Add to `~/.gemini/settings.json`, `~/.cursor/mcp.json` (or `.cursor/mcp.json`), 
 Clients that connect by URL, or a server shared inside a team:
 
 ```bash
-uvx --from git+https://github.com/HsuanC0921/tw-jobs-mcp tw-jobs-mcp --transport streamable-http --port 8000
+uvx tw-jobs-mcp --transport streamable-http --port 8000
 # endpoint: http://127.0.0.1:8000/mcp
 ```
 
@@ -119,7 +119,7 @@ claude mcp add tw-jobs -- uv run --project "$PWD" tw-jobs-mcp
 
 ## Agent skill
 
-The server already tells a model how to use it. The skill in [`skills/tw-jobs`](skills/tw-jobs/SKILL.md) goes further for agents that load skills: how to turn a plain request into arguments, which source to pick, how to read the notes, and what to report. It follows the open Agent Skills format.
+The server already tells a model how to use it. The skill in [`skills/tw-jobs`](https://github.com/HsuanC0921/tw-jobs-mcp/blob/main/skills/tw-jobs/SKILL.md) goes further for agents that load skills: how to turn a plain request into arguments, which source to pick, how to read the notes, and what to report. It follows the open Agent Skills format.
 
 - **Claude Code**: install the plugin, which bundles the server and the skill: `/plugin marketplace add HsuanC0921/tw-jobs-mcp`, then `/plugin install tw-jobs@tw-jobs-mcp`. Or copy `skills/tw-jobs` to `~/.claude/skills/`.
 - **Codex and other skill-aware agents**: copy `skills/tw-jobs` to `~/.agents/skills/` (or `.agents/skills/` in a repository).
@@ -216,4 +216,4 @@ uv run python scripts/update_codes.py   # refresh the area and category tables
 
 ## License
 
-[MIT](LICENSE). Provided as is, without warranty.
+[MIT](https://github.com/HsuanC0921/tw-jobs-mcp/blob/main/LICENSE). Provided as is, without warranty.

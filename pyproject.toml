@@ -1,16 +1,32 @@
 [project]
 name = "tw-jobs-mcp"
-version = "1.1.0"
+version = "1.1.1"
 description = "MCP server for searching Taiwan job boards (104, Yourator, foreign-company career boards) by Chinese area and job-category names"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
 authors = [{ name = "HsuanC0921" }]
-keywords = ["mcp", "model-context-protocol", "taiwan", "jobs", "104"]
+keywords = ["mcp", "model-context-protocol", "taiwan", "jobs", "104", "job-search", "yourator", "workday"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries",
+]
 dependencies = [
     "mcp>=1.2.0,<2",  # 2.x dropped mcp.server.fastmcp
     "curl_cffi>=0.7.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/HsuanC0921/tw-jobs-mcp"
+Repository = "https://github.com/HsuanC0921/tw-jobs-mcp"
+Changelog = "https://github.com/HsuanC0921/tw-jobs-mcp/blob/main/CHANGELOG.md"
+Issues = "https://github.com/HsuanC0921/tw-jobs-mcp/issues"
 
 [project.scripts]
 tw-jobs-mcp = "tw_jobs_mcp.server:main"
