@@ -139,34 +139,50 @@ def _route(raw: str) -> tuple[str, str]:
     return "104", raw
 
 
-def get_job(job_id: str) -> dict:
+def get_job(job_id: str, applicants: bool = False, similar: bool = False) -> dict:
     job_id = job_id.strip()
     if not job_id:
         return {"error": "job_id 不可為空，請使用 search_jobs 結果裡的 id"}
     source, raw = _route(job_id)
     try:
-        if source == "yourator":
-            return yourator.job(raw)
-        if source == "boards":
-            return boards.job(raw)
-        if source == "workday":
-            return workday.job(raw)
-        detail = shape.job_detail(api.job(raw))
+        if source != "104":
+            detail = {"yourator": yourator.job, "boards": boards.job, "workday": workday.job}[source](raw)
+            if applicants or similar:
+                detail["note"] = "應徵者分析與相似職缺只有 104 職缺提供"
+            return detail
+        detail = {"id": raw, "url": f"https://www.104.com.tw/job/{raw}", **shape.job_detail(api.job(raw))}
+        # extras are best effort: the posting itself is already in hand
+        if applicants:
+            detail["applicants"] = _extra(lambda: shape.applicants(api.applicants(raw)))
+        if similar:
+            detail["similar"] = _extra(lambda: shape.similar_jobs(api.similar_jobs(raw)))
     except (SiteError, ValueError) as exc:
         return {"error": str(exc)}
-    return {"id": raw, "url": f"https://www.104.com.tw/job/{raw}", **detail}
+    return detail
 
 
-def get_company(company_id: str, with_openings: bool = False) -> dict:
-    company_id = company_id.strip()
+def _extra(load):
+    try:
+        return load()
+    except (SiteError, ValueError, TypeError, AttributeError) as exc:
+        return {"error": str(exc) or type(exc).__name__}
+
+
+def get_company(company_id: str, with_openings: bool = False, keyword: str = "") -> dict:
+    company_id, keyword = company_id.strip(), keyword.strip()
     if not company_id:
         return {"error": "company_id 不可為空，請使用搜尋結果裡的 company_id"}
+    with_openings = with_openings or bool(keyword)
     source, raw = _route(company_id)
     try:
         if source == "boards":
-            return boards.company(raw, with_openings)
+            info = boards.company(raw, with_openings)
+            if keyword:  # the board API has no search, so match titles here
+                info["openings"] = [o for o in info["openings"]
+                                    if all(w in o["title"].lower() for w in keyword.lower().split())]
+            return info
         if source == "workday":
-            return workday.company(raw, with_openings)
+            return workday.company(raw, with_openings, keyword)
         if source == "yourator":
             info = yourator.company(raw)
             if info is not None and with_openings:
@@ -174,7 +190,8 @@ def get_company(company_id: str, with_openings: bool = False) -> dict:
         else:
             info = shape.company(api.company(raw))
             if info is not None and with_openings:
-                info["openings"] = shape.company_openings(api.company_jobs(raw))
+                found = api.company_jobs(raw, keyword=keyword) if keyword else api.company_jobs(raw)
+                info["openings"] = shape.company_openings(found)
     except SiteError as exc:
         return {"error": str(exc)}
     return info or {"error": f"找不到公司 '{company_id}'，請確認 company_id"}

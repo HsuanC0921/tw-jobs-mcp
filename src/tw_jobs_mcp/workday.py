@@ -209,12 +209,12 @@ def job(raw_id: str) -> dict:
                     "start": info.get("startDate", ""), "shifts": [], "hours": "", "vacation": ""})
 
 
-def company(tenant: str, with_openings: bool) -> dict:
+def company(tenant: str, with_openings: bool, keyword: str = "") -> dict:
     _, careers, name = _api(tenant)
     info = {"id": f"w:{tenant}", "name": name, "industry": "", "employees": "", "capital": "", "address": "",
             "website": "", "profile": "", "products": "", "welfare": "", "followers": 0, "url": careers}
     if with_openings:
-        rows, _ = _company_rows(tenant, "", [], PAGE * 2)
+        rows, _ = _company_rows(tenant, keyword, [], PAGE * 2)
         info["openings"] = [{"id": r["id"], "title": r["title"], "salary": "待遇面議",
                              "location": r["location"], "experience": ""} for r in rows]
     return info

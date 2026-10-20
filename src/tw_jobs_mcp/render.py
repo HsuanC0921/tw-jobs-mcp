@@ -73,9 +73,36 @@ def job(d: dict, full: bool = False) -> str:
               ("出差", c["business_trip"]), ("到職", c["start"]), ("名額", c["headcount"]),
               ("管理", c["management"])),
         _line(("福利", d["welfare"] if full else _clip(d["welfare"], BLURB_LIMIT))),
+        _line(("HR", d.get("hr_activity"))),
         "說明：" + (d["description"].strip() if full else _clip(d["description"], DESC_LIMIT, "，full=True 看全文")),
+        d.get("note", ""),
     ]
+    if "applicants" in d:
+        lines.append(_applicants(d["applicants"]))
+    if "similar" in d:
+        lines.append(_similar(d["similar"]))
     return "\n".join(x for x in lines if x.strip())
+
+
+def _applicants(a: dict) -> str:
+    if "error" in a:
+        return f"應徵分析：讀取失敗（{a['error']}）"
+    if a["at_least"] == 0:
+        return "應徵分析：近兩週沒有人應徵"
+    count = f"至少 {a['at_least']} 人（由比例推算）" if a["at_least"] else "人數無法推算"
+    rows = [f"{label}：" + "、".join(f"{_t(n)} {p:g}%" for n, p in shares[:6])
+            for label, shares in a["groups"].items() if shares]
+    return "\n".join([f"應徵分析（近兩週）：{count}", *rows])
+
+
+def _similar(rows) -> str:
+    if isinstance(rows, dict):
+        return f"相似職缺：讀取失敗（{rows['error']}）"
+    if not rows:
+        return "相似職缺：無"
+    head = "相似職缺 id|company_id|職稱|公司|薪資|地點|年資|HR"
+    keys = ("id", "company_id", "title", "company", "salary", "location", "experience", "hr_activity")
+    return "\n".join([head, *("|".join(_t(r[k]) for k in keys) for r in rows[:10])])
 
 
 def company(d: dict, full: bool = False) -> str:

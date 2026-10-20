@@ -3,14 +3,14 @@
   "name": "io.github.HsuanC0921/tw-jobs-mcp",
   "title": "Taiwan Jobs 台灣求職",
   "description": "Read-only Taiwan job search: 104, Yourator, and Greenhouse, Lever and Workday career sites.",
-  "version": "1.1.3",
+  "version": "1.2.0",
   "websiteUrl": "https://github.com/HsuanC0921/tw-jobs-mcp",
   "repository": { "url": "https://github.com/HsuanC0921/tw-jobs-mcp", "source": "github" },
   "packages": [
     {
       "registryType": "pypi",
       "identifier": "tw-jobs-mcp",
-      "version": "1.1.3",
+      "version": "1.2.0",
       "runtimeHint": "uvx",
       "transport": { "type": "stdio" }
     }

@@ -34,8 +34,8 @@ Leave a field out when the user did not imply it. More filters mean fewer result
 ## 3. Search, read, then dig
 
 1. `search_jobs`. Show the user the few best rows, not the whole table.
-2. `get_job` on the two to five most promising rows; `id` goes in exactly as listed (a prefix such as `y:`, `g:`, `l:`, `w:` marks the source).
-3. `get_company` with the row's `company_id` (add `with_openings=true` to see what else they hire for).
+2. `get_job` on the two to five most promising rows; `id` goes in exactly as listed (a prefix such as `y:`, `g:`, `l:`, `w:` marks the source). The `HR` line says how recently the employer handled résumés, a fair hint of whether anyone is reading applications. For a 104 posting, add `applicants=true` when the user asks how competitive it is (applicant count and their education, experience, skills), and `similar=true` when they want more like it.
+3. `get_company` with the row's `company_id` (add `with_openings=true` to see what else they hire for, or `keyword` to ask whether this company has a certain kind of role).
 4. `salary_overview` to answer "what does this role pay": it samples 104 only.
 
 ## 4. Read the notes

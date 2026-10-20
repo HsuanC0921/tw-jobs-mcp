@@ -131,7 +131,64 @@ def job_detail(payload: dict) -> dict:
             "vacation": body.get("vacationPolicy", ""),
         },
         "welfare": (data.get("welfare") or {}).get("welfare", ""),
+        "hr_activity": _hr(data.get("interactionRecord")),
     }
+
+
+def _hr(record) -> str:
+    """104's own wording of how recently the employer handled résumés or replied."""
+    record = record or {}
+    return "、".join(x for x in (record.get("lastProcessedResumeDesc"), record.get("lastCustReplyDesc")) if x)
+
+
+def similar_jobs(payload: dict) -> list[dict]:
+    rows = (payload.get("data") or {}).get("list") or []
+    return [
+        {
+            "id": last_segment((r.get("link") or {}).get("job", "")),
+            "company_id": last_segment((r.get("link") or {}).get("cust", "")),
+            "title": r.get("name", ""),
+            "company": r.get("custName", ""),
+            "salary": r.get("salaryDesc", ""),
+            "location": r.get("area", ""),
+            "experience": r.get("periodDesc", ""),
+            "hr_activity": _hr(r.get("interactionRecord")),
+        }
+        for r in rows
+    ]
+
+
+# 104's applicant breakdown: (key, label); the first three are one answer per applicant
+_GROUPS = (("edu", "學歷"), ("exp", "年資"), ("yearRange", "年齡"),
+           ("major", "科系"), ("language", "語言"), ("skill", "技能"), ("cert", "證照"))
+
+
+def _headcount(shares: list[float]) -> int | None:
+    """The smallest number of applicants whose whole-person splits round to every share.
+
+    104 hides the count but publishes two-decimal percentages; 28.57/71.43 can only be 2 of 7
+    (or 4 of 14, which is why this is a floor and not a certainty).
+    """
+    if not shares:
+        return 0
+    for n in range(1, 1000):
+        if all(abs(round(p * n / 100) * 100 / n - p) < 0.006 for p in shares):
+            return n
+    return None
+
+
+def applicants(payload: dict) -> dict:
+    groups = {}
+    for key, label in _GROUPS:
+        found = []
+        for item in (payload.get(key) or {}).values():
+            if isinstance(item, dict) and float(item.get("percent") or 0) > 0:
+                name = next((str(v).strip() for k, v in item.items() if k.endswith("Name")), "")
+                found.append((name, round(float(item["percent"]), 1)))
+        groups[label] = sorted(found, key=lambda x: -x[1])
+    single = [float(i["percent"]) for key, _ in _GROUPS[:3] for i in (payload.get(key) or {}).values()
+              if isinstance(i, dict) and float(i.get("percent") or 0) > 0]
+    return {"at_least": _headcount(single), "groups": groups}
 
 
 def company(payload: dict) -> dict | None:
@@ -185,7 +242,7 @@ def blank_detail(**fields) -> dict:
     detail = {
         "id": "", "url": "", "title": "", "company": "", "company_id": "", "industry": "",
         "company_size": "", "posted": "", "closes": "", "categories": [], "salary": "",
-        "location": "", "remote": "", "description": "", "welfare": "",
+        "location": "", "remote": "", "description": "", "welfare": "", "hr_activity": "",
         "requirements": {"experience": "", "education": "", "major": [], "skills": [],
                          "languages": [], "certificates": [], "driver_license": [], "other": ""},
         "conditions": {"headcount": "", "management": "", "business_trip": "", "start": "",

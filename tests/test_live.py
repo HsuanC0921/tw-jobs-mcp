@@ -30,6 +30,9 @@ def test_job_and_company_round_trip():
     assert job["title"] and job["company_id"]
     company = service.get_company(job["company_id"], with_openings=True)
     assert company["name"] and isinstance(company["openings"], list)
+    extras = service.get_job(job_id, applicants=True, similar=True)
+    assert "error" not in extras["applicants"] and isinstance(extras["similar"], list)
+    assert isinstance(service.get_company(job["company_id"], keyword=".NET")["openings"], list)
 
 
 def test_bad_ids_report_cleanly():

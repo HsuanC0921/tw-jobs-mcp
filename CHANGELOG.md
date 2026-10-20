@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.0
+
+- `get_job(applicants=true)`: for a 104 posting, who applied in the last two weeks, by education, experience, age, major, language, skills and certificates. 104 publishes only percentages, so the count is inferred as the smallest number that fits them and shown as "at least". 新增應徵者分析。
+- `get_job(similar=true)`: similar 104 postings, each with its employer's HR activity. 新增相似職缺。
+- Every 104 posting now shows how recently the employer handled résumés or contacted applicants. 職缺顯示 HR 最近處理履歷的時間。
+- `get_company(keyword=...)`: search within one company's openings; on 104 it also matches the job description, so a role whose title omits the skill is still found. 新增公司內關鍵字搜尋。
+- README rewritten: example questions, illustrative output with made-up companies, and the new features. README 重寫。
+
 ## 1.1.3
 
 - Workday results are ranked by how well each title covers the keyword, instead of taking turns between companies, so the closest matches come first. Workday 結果改依職稱與關鍵字的吻合度排序，不再各公司輪流排。

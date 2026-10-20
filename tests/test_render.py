@@ -2,7 +2,7 @@
 import asyncio
 import json
 
-from tw_jobs_mcp import render, server, service
+from tw_jobs_mcp import http, render, server, service
 from tw_jobs_mcp.j104 import api, shape
 
 
@@ -74,6 +74,52 @@ def test_company_text_lists_openings(monkeypatch):
     text = server.get_company("abc", with_openings=True)
     assert text.startswith("ACME｜") and "j1|工程師|月薪 5 萬|台北|" in text
     assert server.get_company("abc").count("\n") == 1  # no openings block unless asked
+
+
+def test_company_keyword_searches_its_openings(monkeypatch):
+    seen = {}
+    monkeypatch.setattr(api, "company", lambda _: {"data": {"custName": "ACME", "custNo": "abc"}})
+    monkeypatch.setattr(api, "company_jobs", lambda cid, **kw: seen.update(kw) or {"data": {"list": {}}})
+    assert "目前無職缺" in server.get_company("abc", keyword="後端")
+    assert seen == {"keyword": "後端"}
+
+
+ANALYSIS = {
+    "edu": {"0": {"eduName": "大學", "percent": "71.43"}, "1": {"eduName": "碩士", "percent": "28.57"},
+            "2": {"eduName": "專科", "percent": "0.00"}, "total": 0},
+    "exp": {"0": {"expName": "1~3年", "percent": "42.86"}, "1": {"expName": "3~5年", "percent": "57.14"}},
+    "skill": {"0": {"skill": 1, "skillName": "Python", "percent": "42.86"}},
+}
+SIMILAR = {"data": {"list": [{"name": "後端工程師", "custName": "甲公司", "salaryDesc": "待遇面議",
+                              "link": {"job": "//www.104.com.tw/job/s1", "cust": "//www.104.com.tw/company/c9"},
+                              "interactionRecord": {"lastProcessedResumeDesc": "1 天內處理過履歷"}}]}}
+
+
+def test_job_extras_applicants_and_similar(monkeypatch):
+    detail = {"data": {"header": {"jobName": "T", "custUrl": "https://x/company/c"},
+                       "interactionRecord": {"lastProcessedResumeDesc": "2 天內處理過履歷"}}}
+    monkeypatch.setattr(api, "job", lambda _: detail)
+    monkeypatch.setattr(api, "applicants", lambda _: ANALYSIS)
+    monkeypatch.setattr(api, "similar_jobs", lambda _: SIMILAR)
+    plain = server.get_job("j1")
+    assert "HR:2 天內處理過履歷" in plain and "應徵分析" not in plain and "相似職缺" not in plain
+    text = server.get_job("j1", applicants=True, similar=True)
+    assert "至少 7 人" in text and "學歷：大學 71.4%、碩士 28.6%" in text and "專科" not in text
+    assert "s1|c9|後端工程師|甲公司|待遇面議||" in text and "1 天內處理過履歷" in text
+
+
+def test_applicant_count_is_inferred_from_shares():
+    assert shape._headcount([]) == 0
+    assert shape._headcount([50.0, 50.0]) == 2
+    assert shape._headcount([28.57, 71.43]) == 7
+    assert shape._headcount([33.33, 66.67]) == 3
+
+
+def test_job_extras_fail_softly(monkeypatch):
+    monkeypatch.setattr(api, "job", lambda _: {"data": {"header": {"jobName": "T"}}})
+    monkeypatch.setattr(api, "applicants", lambda _: (_ for _ in ()).throw(http.SiteError("擋住了")))
+    text = server.get_job("j1", applicants=True)
+    assert text.startswith("T｜") and "應徵分析：讀取失敗（擋住了）" in text
 
 
 def test_overview_text():

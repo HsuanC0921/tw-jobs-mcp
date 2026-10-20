@@ -19,15 +19,15 @@
 
 ## Other tools
 
-- `get_job(job_id, full=false)`: description is clipped at 1,500 characters unless `full=true`.
-- `get_company(company_id, with_openings=false, full=false)`
+- `get_job(job_id, full=false, applicants=false, similar=false)`: description is clipped at 1,500 characters unless `full=true`. 104 only: `applicants` adds who applied in the last two weeks (count inferred from 104's percentages, so read it as "at least"; education, experience, age, major, language, skills, certificates); `similar` adds up to ten similar postings with each employer's HR activity.
+- `get_company(company_id, with_openings=false, keyword="", full=false)`: `keyword` lists only the matching openings. On 104 it also matches the job description, so a role whose title omits the skill is still found.
 - `salary_overview(...)`: same filters as search, 104 only; groups pay by unit and reports count, min, quartiles, median, max over 1 to 5 pages.
 - `lookup_code(kind, name, parent)`: find a 104 area or category code, or browse the tree. `kind` is `area` or `jobcat`.
 - `sources()`: live check of which sources are reachable.
 
 ## Limits worth knowing
 
-- 104 has no company-name search; reach a company through `company_id` on a posting, or put the company name in `keyword`.
+- 104's company-name search is blocked to scripts; reach a company through `company_id` on a posting, or put the company name in `keyword` of `search_jobs` (titles and company names are both matched).
 - Workday searches read only the first 60 rows per company; narrow a deep search with a keyword.
 - Yourator reports no total, so its count is a lower bound.
 - Results are cached for five minutes.
