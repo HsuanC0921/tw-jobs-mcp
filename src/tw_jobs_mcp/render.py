@@ -47,7 +47,8 @@ def search(page: dict) -> str:
     if not page["jobs"]:
         return "\n".join([f"無結果（共 {page['total']} 筆）。試著拿掉薪資、學歷等條件，或改 source=all", *notes])
     split = "（" + "、".join(f"{k} {v}" for k, v in page["totals"].items()) + "）" if "totals" in page else ""
-    head = (f"共 {page['total']} 筆{split}，第 {page['page']}/{page['pages']} 頁\n"
+    more = "+" if page.get("at_least") else ""  # Yourator reports no total, only that more exist
+    head = (f"共 {page['total']}{more} 筆{split}，第 {page['page']}/{page['pages']}{more} 頁\n"
             "id|company_id|職稱|公司|薪資|地點|學歷|技能|刊登")
     return "\n".join([head, *map(_job_row, page["jobs"]), *notes])
 

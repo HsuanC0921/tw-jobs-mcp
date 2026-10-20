@@ -91,9 +91,10 @@ def _run(names: tuple[str, ...], f: dict) -> dict:
         "total": sum(p["total"] for p in pages.values()), "page": f.get("page", 1),
         "pages": max(p["pages"] for p in pages.values()),
         "has_next": any(p["has_next"] for p in pages.values()), "jobs": rows, "notes": notes,
+        "at_least": any(p.get("at_least") for p in pages.values()),
     }
     if len(pages) > 1:
-        merged["totals"] = {name: p["total"] for name, p in pages.items()}
+        merged["totals"] = {name: f"{p['total']}+" if p.get("at_least") else p["total"] for name, p in pages.items()}
     return merged
 
 

@@ -79,6 +79,27 @@ def test_yourator_paging_covers_fixed_site_pages(fake):
     assert yourator.area_codes(["台北市", "新竹縣", "火星"]) == ["TPE", "HSQ"]
 
 
+def test_yourator_total_is_shown_as_a_lower_bound(fake):
+    out = service.search_jobs(source="yourator", per_page=10)
+    assert out["at_least"] and render.search(out).startswith("共 10+ 筆，第 1/2+ 頁")
+
+
+def test_workday_ranks_across_companies(monkeypatch):
+    def rows(tenant, keyword, cities, want):
+        titles = {"a": ["Quality Manager", "Hardware Engineer"], "b": ["Field Engineer"]}.get(tenant, [])
+        return [{"title": t, "company": tenant} for t in titles], len(titles)
+    monkeypatch.setattr(workday, "companies", lambda: {"a": (), "b": ()})
+    monkeypatch.setattr(workday, "_company_rows", rows)
+    page, _ = workday.search(keyword="hardware engineer", areas=[], page=1, per_page=3)
+    assert [r["title"] for r in page["jobs"]][0] == "Hardware Engineer"
+
+
+def test_workday_multi_location_says_so():
+    raw = {"locationsText": "2 個地點", "externalPath": "/job/Taiwan---Taipei/Engineer_1"}
+    assert workday._place(raw) == "Taiwan Taipei 等 2 地"
+    assert workday._place({"locationsText": "Hsinchu", "externalPath": "/job/x/y"}) == "Hsinchu"
+
+
 def test_yourator_row_ids_and_pay(fake):
     row = yourator.search(keyword="", areas=[], newest=False, page=1, per_page=1)["jobs"][0]
     assert row["id"] == "y:co/0" and row["company_id"] == "y:co"

@@ -62,7 +62,8 @@ def search(*, keyword: str, areas: list[str], newest: bool, page: int, per_page:
     jobs = [_row(j) for j in rows[offset:offset + per_page]]
     has_next = more or len(rows) > offset + per_page
     # the site reports no total, so this is a lower bound
-    return blank_page(jobs, total=start + len(jobs) + (1 if has_next else 0), page=page, has_next=has_next)
+    found = blank_page(jobs, total=start + len(jobs), page=page, has_next=has_next)
+    return {**found, "at_least": has_next}
 
 
 def job(raw_id: str) -> dict:

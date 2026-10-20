@@ -12,6 +12,7 @@ from itertools import zip_longest
 
 from . import http, text
 from .boards import _CITIES, _TAIWAN
+from .j104 import rank
 from .j104.shape import blank_detail, blank_page, blank_row
 
 # tenant: (data centre, career site, display name)
@@ -58,7 +59,7 @@ DEFAULT_COMPANIES = {
 PAGE = 20  # the most Workday returns per request
 DEPTH = 60  # rows read per company per search; deeper pages are not reachable
 _LOCATION_PARAMS = ("locationCountry", "locationHierarchy1", "locations")
-_MANY = re.compile(r"\d+\s*(Locations?|個地點)", re.I)
+_MANY = re.compile(r"(\d+)\s*(?:Locations?|個地點)", re.I)
 _DAYS = re.compile(r"(\d+)")
 
 
@@ -123,9 +124,9 @@ def _ago(label: str) -> str:
 
 def _place(raw: dict) -> str:
     where = raw.get("locationsText", "")
-    if _MANY.fullmatch(where):  # "3 Locations": the first one is in the path
+    if m := _MANY.fullmatch(where):  # "3 Locations": the first one is in the path
         segment = raw["externalPath"].split("/")[2]
-        return segment.replace("-", " ").strip()
+        return f"{' '.join(segment.replace('-', ' ').split())} 等 {m.group(1)} 地"
     return where
 
 
@@ -177,6 +178,10 @@ def search(*, keyword: str, areas: list[str], page: int, per_page: int,
     notes = [n for _, n in loaded if n]
     total = sum(t for (_, t), _ in loaded)
     rows = [r for group in zip_longest(*(rows for (rows, _), _ in loaded)) for r in group if r]
+    # Taking turns puts every company's first hit near the top, relevant or not; rank across them.
+    # ponytail: the pool grows by 20 rows per company as pages deepen, so deep pages can shift a little
+    if keyword:
+        rows = rank.rerank(keyword, rows)
     window = rows[start:start + per_page]
     if not window and total > start:
         notes.append(f"workday 每家只讀前 {DEPTH} 筆，更深的頁數請改用關鍵字縮小範圍")

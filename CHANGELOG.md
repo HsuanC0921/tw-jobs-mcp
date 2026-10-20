@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.3
+
+- Workday results are ranked by how well each title covers the keyword, instead of taking turns between companies, so the closest matches come first. Workday 結果改依職稱與關鍵字的吻合度排序，不再各公司輪流排。
+- A Workday posting listed in several places now says so (`Hsinchu 等 2 地`), so a city search no longer looks like it returned another city. 多地點職缺會標示「等 N 地」。
+- Yourator reports no total, so its count is shown as a lower bound (`20+`) instead of a number that looked exact. Yourator 筆數改標為下限。
+
 ## 1.1.2
 
 - Added `server.json` and the ownership marker the official MCP Registry needs. 加入 MCP 官方 Registry 所需的 `server.json` 與所有權標記。
