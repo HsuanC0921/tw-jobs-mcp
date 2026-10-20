@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1
+
+- `search_jobs(include_negotiable=true)`: with `salary_min`, also list 面議 postings. 104 leaves them out once a pay floor is set, which hid most of the finance industry; a note now says so. 新增 `include_negotiable`，設薪資下限時可連面議職缺一起列，並在結果註記提醒。
+- The search table has a new 年資 column (不拘 / N年+), so you can see which roles accept newcomers without opening each one. 搜尋表格新增年資欄。
+- Clearer wording: `my_years` also lists 經驗不拘 roles, and the server instructions tell the model to say when it has seen only one page. 說明寫清楚 `my_years` 含經驗不拘，並提醒模型說明只看了一頁。
+
 ## 1.2.0
 
 - `get_job(applicants=true)`: for a 104 posting, who applied in the last two weeks, by education, experience, age, major, language, skills and certificates. 104 publishes only percentages, so the count is inferred as the smallest number that fits them and shown as "at least". 新增應徵者分析。

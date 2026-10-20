@@ -38,7 +38,7 @@ def _posted(stamp: str) -> str:
 def _job_row(j: dict) -> str:
     where = j["location"] + ("（遠端）" if j["remote"] == "完全遠端" else "（部分遠端）" if j["remote"] else "")
     cols = [j["id"], j["company_id"], j["title"], j["company"], pay(j["pay"]), where,
-            _education(j["education"]), "/".join(j["skills"][:5]), _posted(j["posted"])]
+            j.get("experience", ""), _education(j["education"]), "/".join(j["skills"][:5]), _posted(j["posted"])]
     return "|".join(_t(c) for c in cols)
 
 
@@ -49,7 +49,7 @@ def search(page: dict) -> str:
     split = "（" + "、".join(f"{k} {v}" for k, v in page["totals"].items()) + "）" if "totals" in page else ""
     more = "+" if page.get("at_least") else ""  # Yourator reports no total, only that more exist
     head = (f"共 {page['total']}{more} 筆{split}，第 {page['page']}/{page['pages']}{more} 頁\n"
-            "id|company_id|職稱|公司|薪資|地點|學歷|技能|刊登")
+            "id|company_id|職稱|公司|薪資|地點|年資|學歷|技能|刊登")
     return "\n".join([head, *map(_job_row, page["jobs"]), *notes])
 
 

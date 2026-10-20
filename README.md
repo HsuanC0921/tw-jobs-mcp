@@ -145,7 +145,8 @@ The server already tells a model how to use it. [`skills/tw-jobs`](https://githu
 | `source` | `104` (default), `yourator`, `boards`, `workday`, or `all` |
 | `area`, `jobcat` | Chinese names, e.g. `["台北市", "新北市"]`, `["軟體工程師"]` |
 | `salary_min`, `salary_unit` | Salary floor and its unit: `月薪` (default), `年薪`, `日薪`, `時薪` |
-| `my_years` | The user's years of experience; lists postings asking for no more |
+| `include_negotiable` | With `salary_min`, also list postings that do not state a salary (104 leaves them out by default) |
+| `my_years` | The user's years of experience; lists postings asking for no more, 經驗不拘 included |
 | `education` | `高中職`, `專科`, `大學`, `碩士`, `博士` |
 | `job_type` | `全職`, `兼職`, `高階`, `派遣` |
 | `remote_only`, `new_only` | Remote only; posted within 7 days |

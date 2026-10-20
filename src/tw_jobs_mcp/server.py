@@ -18,7 +18,7 @@ INSTRUCTIONS = (
     "來源：104 最大、條件最完整（中文）；yourator 新創與外商據點；boards、workday 是外商官網職缺（英文，只支援 keyword 與 area）；all 全部合併。外商、英文、稀有缺用 all。\n"
     "關鍵字：職稱或技能各準備中文（keyword，給 104）與英文（keyword_en，給其他來源）兩種常用說法，互為翻譯，1~3 個短詞，不放地區與薪資。\n"
     "條件：填成使用者真正的限制，單位自行換算（年薪百萬 → salary_min=1000000, salary_unit=年薪）。\n"
-    "結果下方的「註」是伺服器做的假設或放寬，請轉告使用者；無結果時先看註再自行調整。流程 search_jobs → get_job → get_company，id 原樣傳入。連不上時呼叫 sources。"
+    "結果下方的「註」是伺服器做的假設或放寬，請轉告使用者；無結果時先看註再自行調整。總筆數遠多於一頁時，說明只看了這一頁，需要再用 page 翻。流程 search_jobs → get_job → get_company，id 原樣傳入。連不上時呼叫 sources。"
 )
 
 mcp = FastMCP("tw-jobs", instructions=INSTRUCTIONS)
@@ -50,6 +50,7 @@ def search_jobs(
     source: Source = "104",
     salary_min: int | None = None,
     salary_unit: SalaryUnit = "月薪",
+    include_negotiable: bool = False,
     area: list[str] | None = None,
     jobcat: list[str] | None = None,
     education: Education | None = None,
@@ -62,12 +63,13 @@ def search_jobs(
     per_page: int = 20,
 ) -> str:
     """搜尋職缺，回傳表格（id 給 get_job，company_id 給 get_company）。
-    keyword 中文（給 104）、keyword_en 英文（給其他來源），互為翻譯；只填一個時兩邊共用。
-    非 104 來源只支援 keyword、area（yourator 另有 sort=newest，boards 另有 remote_only），其餘條件會在註記說明未套用。
-    area/jobcat 填中文名稱（台北市、軟體工程師）。salary_min 的單位是 salary_unit。
-    my_years＝使用者的年資，只列要求不超過的。per_page≤30。"""
+keyword 中文（給 104）、keyword_en 英文（給其他來源），互為翻譯；只填一個時兩邊共用。
+非 104 來源只支援 keyword、area（yourator 另有 sort=newest，boards 另有 remote_only），其餘條件會在註記說明未套用。
+area/jobcat 填中文名稱（台北市、軟體工程師）。salary_min 的單位是 salary_unit，104 預設不含面議，include_negotiable=True 才納入。
+my_years＝使用者的年資，列出要求不超過它的（含經驗不拘）。per_page≤30，用 page 翻頁。"""
     result = service.search_jobs(
-        keyword=keyword, keyword_en=keyword_en, source=source, salary_min=salary_min, salary_unit=salary_unit, area=area or (),
+        keyword=keyword, keyword_en=keyword_en, source=source, salary_min=salary_min, salary_unit=salary_unit,
+        include_negotiable=include_negotiable, area=area or (),
         jobcat=jobcat or (), education=education, my_years=my_years, job_type=job_type,
         remote=remote_only, new_only=new_only, sort=sort, page=page, per_page=per_page,
     )

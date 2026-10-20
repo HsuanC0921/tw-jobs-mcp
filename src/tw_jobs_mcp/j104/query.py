@@ -35,6 +35,7 @@ def build(
     *, keyword="", area=(), jobcat=(), salary_min=None, salary_unit="月薪",
     job_type=None, remote=False, new_only=False, my_years=None,
     education=None, sort="relevance", page=1, per_page=20, keyword_en=None, area_names=None,  # the last two are for other sources
+    include_negotiable=False,
 ) -> dict[str, str]:
     """Validate everything first, then emit only the parameters that were asked for."""
     check_paging(page, per_page)
@@ -53,6 +54,7 @@ def build(
         ("scmin", salary_min),
         ("sctp", _pick("salary_unit", salary_unit, SALARY_UNITS) if has_salary else None),
         ("scstrict", "1" if has_salary else None),
+        ("scneg", "1" if has_salary and include_negotiable else None),  # without it scmin drops every 面議 posting
         ("ro", _pick("job_type", job_type, JOB_TYPES) if job_type else None),
         ("remoteWork", "1,2" if remote else None),  # 1 完全遠端、2 部分遠端
         ("isnew", "7" if new_only else None),

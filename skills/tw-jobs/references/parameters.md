@@ -8,9 +8,10 @@
 | `source` | `104` (default), `yourator`, `boards`, `workday`, `all` |
 | `area` | Chinese place names. A bare city (`新北`) means the city; a name matching a few places (`新竹`, `中山區`) is widened to all of them, noted under the results. |
 | `jobcat` | 104 job categories by Chinese name (`軟體工程師`). A name that cannot be matched becomes a keyword. `lookup_code` browses the tree. |
-| `salary_min`, `salary_unit` | Floor, in the unit stated. 104 applies it on the server. Other sources ignore it and say so. |
+| `salary_min`, `salary_unit` | Floor, in the unit stated. 104 applies it on the server. Other sources ignore it and say so. 104 leaves out 面議 postings when a floor is set. |
+| `include_negotiable` | With `salary_min`, also list 面議 postings (104 only). They often outnumber the paid ones, so pair it with a narrow keyword. |
 | `education` | Postings whose requirement includes it or has none. 104 only. |
-| `my_years` | The user's years of experience. 104 only. |
+| `my_years` | The user's years of experience; lists roles asking for no more, 經驗不拘 included. 104 only. |
 | `job_type` | 104 only. |
 | `remote_only` | Fully or partly remote. 104 and boards. |
 | `new_only` | Posted in the last 7 days. 104 only. |

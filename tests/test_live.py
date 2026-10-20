@@ -23,6 +23,10 @@ def test_filters_really_apply():
     assert service.search_jobs(keyword="工程師", job_type="兼職", per_page=1)["total"] < base["total"] / 10
     assert service.search_jobs(keyword="工程師", my_years=2, per_page=1)["total"] < base["total"]
 
+    with_negotiable = service.search_jobs(keyword="工程師", salary_min=70000, include_negotiable=True, per_page=10)
+    assert with_negotiable["total"] > paid["total"] * 3 and any(j["salary"] == "待遇面議" for j in with_negotiable["jobs"])
+    assert any(j["experience"] for j in base["jobs"])
+
 
 def test_job_and_company_round_trip():
     job_id = service.search_jobs(keyword=".NET", per_page=3)["jobs"][0]["id"]

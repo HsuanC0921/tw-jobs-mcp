@@ -9,7 +9,7 @@ from tw_jobs_mcp.j104 import api, shape
 def _row(i, **extra):
     return {
         "jobName": f"職缺{i}|含直線", "custName": "ACME", "salaryLow": 60000, "salaryHigh": 80000, "s10": 50,
-        "jobAddrNoDesc": "台北市", "optionEdu": [4, 5], "appearDate": "20261016", "jobType": "0",
+        "jobAddrNoDesc": "台北市", "period": 0, "optionEdu": [4, 5], "appearDate": "20261016", "jobType": "0",
         "pcSkills": [{"description": s} for s in "ABCDEFG"],
         "link": {"job": f"https://x/job/j{i}", "cust": "https://x/company/c"}, **extra,
     }
@@ -32,13 +32,13 @@ def test_search_table_shape(monkeypatch):
     text = server.search_jobs(keyword="x")
     lines = text.splitlines()
     assert lines[0] == "共 36 筆，第 1/2 頁"  # 40 minus the two paid rows on each of 2 pages
-    assert lines[1].split("|") == ["id", "company_id", "職稱", "公司", "薪資", "地點", "學歷", "技能", "刊登"]
+    assert lines[1].split("|") == ["id", "company_id", "職稱", "公司", "薪資", "地點", "年資", "學歷", "技能", "刊登"]
     cells = lines[2].split("|")
-    assert len(cells) == 9 and cells[0] == "j1" and cells[1] == "c"
+    assert len(cells) == 10 and cells[0] == "j1" and cells[1] == "c"
     assert cells[2] == "職缺1/含直線"  # a pipe in a title must not break the table
-    assert cells[4] == "月60000~80000" and cells[6] == "大學~碩士"
-    assert cells[7] == "A/B/C/D/E"  # at most five skills
-    assert cells[8] == "10-16" and "（遠端）" in lines[3]
+    assert cells[4] == "月60000~80000" and cells[6] == "不拘" and cells[7] == "大學~碩士"
+    assert cells[8] == "A/B/C/D/E"  # at most five skills
+    assert cells[9] == "10-16" and "（遠端）" in lines[3]
 
 
 def test_empty_result_and_errors(monkeypatch):
@@ -143,7 +143,7 @@ def test_tool_listing_stays_small():
     size = sum(len(json.dumps(
         {"name": t.name, "description": t.description, "inputSchema": t.inputSchema},
         ensure_ascii=False, separators=(",", ":"))) for t in tools)
-    assert size < 2900, size
+    assert size < 3000, size
     assert len(server.INSTRUCTIONS) < 900
 
 

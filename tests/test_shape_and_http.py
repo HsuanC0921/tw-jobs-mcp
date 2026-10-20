@@ -22,6 +22,10 @@ def _row(no, kind, **extra):
     return {"jobName": no, "jobType": kind, "link": {"job": f"//www.104.com.tw/job/{no}"}, **extra}
 
 
+def test_list_experience_codes():
+    assert [shape._years(c) for c in (0, 2, 3, 11, 1, None)] == ["不拘", "1年+", "2年+", "10年+", "", ""]
+
+
 def test_search_page_drops_sponsored():
     payload = {
         "data": [_row("ad", "1"), _row("abc", "0", appearDate="20261016", remoteWorkType=2)],

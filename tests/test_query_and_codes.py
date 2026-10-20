@@ -47,6 +47,12 @@ def test_salary_needs_unit_code():
     assert p["order"] == "15"  # asking for a salary floor does not change the sort
 
 
+def test_negotiable_postings_are_opt_in_and_need_a_salary_floor():
+    assert "scneg" not in query.build(salary_min=60000)
+    assert query.build(salary_min=60000, include_negotiable=True)["scneg"] == "1"
+    assert "scneg" not in query.build(include_negotiable=True)  # nothing to include without a floor
+
+
 def test_job_type_is_sent_as_ro():
     p = query.build(job_type="兼職")
     assert p["ro"] == "2" and "wt" not in p

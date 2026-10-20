@@ -224,3 +224,10 @@ def test_version_is_the_same_everywhere():
     assert tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"] == __version__
     assert json.loads((root / "manifest.json").read_text(encoding="utf-8"))["version"] == __version__
     assert __version__.split(".")[0] == "1"
+
+
+def test_salary_floor_note_says_negotiable_is_left_out(monkeypatch):
+    monkeypatch.setattr(api, "search", lambda _: {"data": [_row(1, 1, 2)], "metadata": {"pagination": {"total": 1, "currentPage": 1, "lastPage": 1}}})
+    assert any("include_negotiable" in n for n in service.search_jobs(keyword="x", salary_min=60000)["notes"])
+    assert not any("include_negotiable" in n for n in service.search_jobs(keyword="x", salary_min=60000, include_negotiable=True)["notes"])
+    assert not any("include_negotiable" in n for n in service.search_jobs(keyword="x")["notes"])

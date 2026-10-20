@@ -49,6 +49,11 @@ def _names(items) -> list[str]:
     return [i["description"] for i in items or [] if isinstance(i, dict) and i.get("description")]
 
 
+def _years(code) -> str:
+    """The list's `period`: 0 is 不拘, n >= 2 is (n - 1) years or more (checked against the postings; 1 never seen)."""
+    return "不拘" if code == 0 else f"{code - 1}年+" if isinstance(code, int) and code >= 2 else ""
+
+
 def search_row(row: dict) -> dict:
     links = row.get("link") or {}
     url = _absolute(links.get("job", ""))
@@ -67,6 +72,7 @@ def search_row(row: dict) -> dict:
         "nearby_mrt": row.get("mrtDesc", ""),
         "hours": row.get("d3", ""),
         "remote": _REMOTE.get(row.get("remoteWorkType"), ""),
+        "experience": _years(row.get("period")),
         "education": [_EDUCATION[c] for c in row.get("optionEdu") or [] if c in _EDUCATION],
         "major": row.get("major") or [],
         "skills": _names(row.get("pcSkills")),

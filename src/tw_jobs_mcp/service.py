@@ -119,6 +119,8 @@ def search_jobs(*, source: str = "104", **f) -> dict:
     if source != "all" and source not in SOURCES:
         return {"error": f"source 只能是 {'、'.join(SOURCES)}、all，收到 '{source}'"}
     names = SOURCES if source == "all" else (source,)
+    if "104" in names and f.get("salary_min") is not None and not f.get("include_negotiable"):
+        notes.append("104 套用 salary_min 時不含面議職缺（如金融業常見）；要一併列出請設 include_negotiable=true")
     try:
         result = _run(names, f)
         if not result["total"]:

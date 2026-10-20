@@ -15,8 +15,8 @@ Read the request once and fill in every field it implies. Do not paste the user'
 |---|---|
 | the role or skill | `keyword` (Chinese, for 104) **and** `keyword_en` (English, for the other sources): each the common title in that language, 1 to 3 short words, translated from whichever the user gave. A term with no common translation (Python, React) goes into both unchanged |
 | a city or district | `area`, Chinese names: `["台北市"]`, `["新竹"]` |
-| a pay floor | `salary_min` in the unit they used; set `salary_unit`: 月薪 / 年薪 / 日薪 / 時薪. Convert spoken forms: 「5 萬」→ 50000, 「年薪百萬」→ 1000000 with 年薪 |
-| years of experience | `my_years` (their own years; only roles asking for no more are listed) |
+| a pay floor | `salary_min` in the unit they used; set `salary_unit`: 月薪 / 年薪 / 日薪 / 時薪. Convert spoken forms: 「5 萬」→ 50000, 「年薪百萬」→ 1000000 with 年薪. 104 drops 面議 postings once a floor is set (common in finance); add `include_negotiable=true` when the user wants those too |
+| years of experience | `my_years` (their own years; only roles asking for no more are listed, 經驗不拘 included) |
 | remote | `remote_only=true` |
 | "recent", "new" | `new_only=true` (last 7 days) or `sort="newest"` |
 | a degree | `education`: 高中職 / 專科 / 大學 / 碩士 / 博士 |
