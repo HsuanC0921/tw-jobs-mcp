@@ -76,15 +76,13 @@ def search_jobs(
 
 @_tool
 def get_job(job_id: str, full: bool = False, applicants: bool = False, similar: bool = False) -> str:
-    """職缺完整內容（job_id 來自 search_jobs）。說明預設截斷，full=True 看全文。
-    104 限定：applicants＝近兩週應徵人數與背景分布，similar＝相似職缺。"""
+    """職缺完整內容，full=True 看全文。104 限定：applicants＝近兩週應徵者人數與背景，similar＝相似職缺。"""
     return _emit(service.get_job(job_id, applicants, similar), lambda d: render.job(d, full))
 
 
 @_tool
 def get_company(company_id: str, with_openings: bool = False, keyword: str = "", full: bool = False) -> str:
-    """公司簡介（company_id 來自搜尋結果或 get_job）。with_openings=True 附目前職缺；
-    keyword 只列符合的職缺（104 連內文比對）。"""
+    """公司簡介。with_openings=True 附目前職缺；keyword 只列符合的職缺（104 連內文比對）。"""
     return _emit(service.get_company(company_id, with_openings, keyword), lambda d: render.company(d, full))
 
 
