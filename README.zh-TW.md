@@ -140,7 +140,7 @@ HTTP 版沒有任何驗證。請只開在本機或內網，或在前面放一層
 | 參數 | 說明 |
 |---|---|
 | `keyword`、`keyword_en` | 1 到 3 個短詞。`keyword` 放中文給 104，`keyword_en` 放英文給外商網站，兩者互為翻譯。助理會兩邊都填，所以用中文也找得到外商職缺。 |
-| `source` | `104`（預設）、`yourator`、`boards`、`workday`、`all` |
+| `source` | `104`（預設）、`yourator`、`cake`、`freehire`、`boards`、`workday`、`all` |
 | `area`、`jobcat` | 中文名稱，例如 `["台北市", "新北市"]`、`["軟體工程師"]` |
 | `salary_min`、`salary_unit` | 薪資下限與單位：`月薪`（預設）、`年薪`、`日薪`、`時薪` |
 | `include_negotiable` | 搭配 `salary_min`，連沒寫薪資的面議職缺一起列（104 預設不含） |
@@ -157,15 +157,17 @@ HTTP 版沒有任何驗證。請只開在本機或內網，或在前面放一層
 |---|---|---|
 | `104` | 台灣最大的人力銀行 | 全部 |
 | `yourator` | 新創與外商據點 | `keyword`、`area`、`sort=newest` |
+| `cake` | 新創、外商據點與許多本土公司；不需瀏覽器，104 被擋時仍可用 | `keyword`、`area`、`my_years`、`remote_only` |
+| `freehire` | 彙整各家官網與 LinkedIn 的職缺 | `keyword`、`area`、`sort=newest` |
 | `boards` | 外商 Greenhouse、Lever 職缺板上的台灣職缺 | `keyword`、`area`、`remote_only` |
 | `workday` | 38 家外商在 Workday 上的台灣職缺 | `keyword`、`area` |
 | `all` | 以上全部，合併後一起排序 | 依各來源；某個來源失敗只會註明，不影響其他來源 |
 
-id 標示職缺出處：沒有前綴是 104，`y:` 是 Yourator，`g:`／`l:` 是 Greenhouse／Lever，`w:` 是 Workday。請原樣傳回。
+id 標示職缺出處：沒有前綴是 104，`y:` 是 Yourator，`c:` 是 Cake，`f:` 是 freehire，`g:`／`l:` 是 Greenhouse／Lever，`w:` 是 Workday。請原樣傳回。
 
 用 `TW_JOBS_BOARDS`（`g:gitlab,l:kraken,-g:stripe`）與 `TW_JOBS_WORKDAY`（`acme.wd1/External,-micron`）增減職缺網站，開頭 `-` 代表移除。每次 Workday 搜尋每家公司只讀前 60 筆，要查更深請用關鍵字縮小範圍。
 
-刻意不收：**1111**（性質與 104 相同、規模較小）、**Cake**（每個請求都被 Cloudflare 驗證擋下）、**LinkedIn**（使用條款禁止自動化存取）。
+刻意不收：**1111**（性質與 104 相同、規模較小）、**LinkedIn**（使用條款禁止自動化存取）。
 
 ## 設定
 

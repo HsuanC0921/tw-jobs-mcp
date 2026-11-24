@@ -29,6 +29,8 @@ Leave a field out when the user did not imply it. More filters mean fewer result
 - **104** (default): the largest board, Chinese, and the only source that applies every filter. Use it for ordinary searches and for pay statistics (`salary_overview`).
 - **all**: use whenever the user wants foreign companies, English-language roles, rare roles, or says nothing is available on 104. Merges every source and ranks them together.
 - **yourator**: start-ups and foreign-company offices.
+- **cake**: start-ups, foreign offices and many local firms; the fallback when 104 answers 403.
+- **freehire**: aggregates company career sites and LinkedIn.
 - **workday** and **boards**: foreign companies' own career sites (semiconductor, hardware, pharma, finance, and more). English titles, and only `keyword`, `area` (plus `remote_only` for boards) apply.
 
 ## 3. Search, read, then dig

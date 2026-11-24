@@ -91,10 +91,10 @@ def test_not_found_fails_fast(monkeypatch):
 
 
 def test_persistent_block_raises(monkeypatch):
-    calls = _fake_send(monkeypatch, (403,), (403,), (429,), (403,))
-    with pytest.raises(http.SiteError, match="403"):
+    calls = _fake_send(monkeypatch, (403,), (429,))
+    with pytest.raises(http.SiteError, match="403|429"):
         http.get_json("u", referer="r")
-    assert len(calls) == 4  # two rounds over both profiles
+    assert len(calls) == 2  # one pass over both profiles, no more hammering a blocking host
 
 
 def test_non_json_body_raises(monkeypatch):
@@ -103,7 +103,23 @@ def test_non_json_body_raises(monkeypatch):
         http.get_json("u", referer="r")
 
 
-def test_block_that_clears_on_the_second_round_succeeds(monkeypatch):
+def test_blocked_host_is_left_alone_until_the_cooldown_ends(monkeypatch):
     calls = _fake_send(monkeypatch, (403,), (403,), (200, {"ok": 1}))
-    assert http.get_json("u", referer="r") == {"ok": 1}
-    assert len(calls) == 3
+    with pytest.raises(http.SiteError):
+        http.get_json("https://h/a", referer="r")
+    with pytest.raises(http.SiteError, match="暫停"):
+        http.get_json("https://h/b", referer="r")
+    assert len(calls) == 2  # the second request never left the machine
+    http.clear_cache()  # clearing also lifts the cooldown
+    assert http.get_json("https://h/c", referer="r") == {"ok": 1}
+
+
+def test_cooldown_lengthens_on_repeated_blocks_and_resets_on_success(monkeypatch):
+    _fake_send(monkeypatch, (403,), (403,), (403,), (403,), (200, {}))
+    for _ in range(2):
+        with pytest.raises(http.SiteError):
+            http.get_json("https://h/a", referer="r")
+        http._cool_until["h"] = 0.0  # pretend the wait passed
+    assert http._strikes["h"] == 2
+    http.get_json("https://h/a", referer="r")
+    assert "h" not in http._strikes

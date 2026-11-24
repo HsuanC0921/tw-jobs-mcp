@@ -142,7 +142,7 @@ The server already tells a model how to use it. [`skills/tw-jobs`](https://githu
 | Argument | Meaning |
 |---|---|
 | `keyword`, `keyword_en` | 1 to 3 short terms. Chinese in `keyword` for 104, English in `keyword_en` for the foreign sites, each a translation of the other. The assistant fills both, so a Chinese request also finds foreign postings. |
-| `source` | `104` (default), `yourator`, `boards`, `workday`, or `all` |
+| `source` | `104` (default), `yourator`, `cake`, `freehire`, `boards`, `workday`, or `all` |
 | `area`, `jobcat` | Chinese names, e.g. `["台北市", "新北市"]`, `["軟體工程師"]` |
 | `salary_min`, `salary_unit` | Salary floor and its unit: `月薪` (default), `年薪`, `日薪`, `時薪` |
 | `include_negotiable` | With `salary_min`, also list postings that do not state a salary (104 leaves them out by default) |
@@ -159,15 +159,17 @@ The server already tells a model how to use it. [`skills/tw-jobs`](https://githu
 |---|---|---|
 | `104` | Taiwan's largest job board | all |
 | `yourator` | Start-ups and foreign-company offices | `keyword`, `area`, `sort=newest` |
+| `cake` | Start-ups, foreign offices and many local firms; needs no browser and is not blocked when 104 is | `keyword`, `area`, `my_years`, `remote_only` |
+| `freehire` | Aggregates company career sites and LinkedIn | `keyword`, `area`, `sort=newest` |
 | `boards` | Taiwan roles on companies' Greenhouse and Lever boards | `keyword`, `area`, `remote_only` |
 | `workday` | Taiwan roles at 38 foreign employers on Workday | `keyword`, `area` |
 | `all` | All of the above, merged and ranked | per source; a failing source is noted, not fatal |
 
-Ids tell where a posting lives: a bare id is 104, `y:` Yourator, `g:` / `l:` Greenhouse / Lever, `w:` Workday. Pass them back as listed.
+Ids tell where a posting lives: a bare id is 104, `y:` Yourator, `c:` Cake, `f:` freehire, `g:` / `l:` Greenhouse / Lever, `w:` Workday. Pass them back as listed.
 
 Add or remove career sites with `TW_JOBS_BOARDS` (`g:gitlab,l:kraken,-g:stripe`) and `TW_JOBS_WORKDAY` (`acme.wd1/External,-micron`); a leading `-` removes one. Each Workday search reads the first 60 rows per company, so narrow deep searches with a keyword.
 
-Left out on purpose: **1111** (the same kind of board as 104, smaller), **Cake** (a Cloudflare challenge on every request) and **LinkedIn** (its terms forbid automated access).
+Left out on purpose: **1111** (the same kind of board as 104, smaller) and **LinkedIn** (its terms forbid automated access).
 
 ## Configuration
 

@@ -3,7 +3,7 @@ import json
 
 import pytest
 
-from tw_jobs_mcp import boards, http, render, service, workday, yourator
+from tw_jobs_mcp import boards, cake, freehire, http, render, service, workday, yourator
 
 GH_JOBS = {"jobs": [
     {"id": 1, "title": "SRE", "company_name": "Appier", "location": {"name": "Taipei, Taiwan"},
@@ -29,8 +29,19 @@ def _api_row(n, path_slug="co"):
 def fake(monkeypatch):
     calls = []
 
-    def get_json(url, *, referer=None, params=None):
+    def post_json(url, body, *, referer=None, headers=None):
+        calls.append((url, body))
+        rows = [{"path": f"j{n}", "title": f"cake{n}", "page": {"path": "co", "name": "Co"},
+                 "locations": ["台北市, 台灣"], "salary": {"min": "50000", "max": "80000", "type": "per_month"},
+                 "content_updated_at": "2026-11-20T00:00:00Z"} for n in range(body["per_page"])]
+        return {"data": rows, "total_entries": 120, "total_pages": 3}
+
+    def get_json(url, *, referer=None, params=None, headers=None):
         calls.append((url, params))
+        if "freehire" in url:
+            rows = [{"public_slug": f"s{n}", "title": f"fh{n}", "company": "Co", "location": "Taipei", "posted_at": "2026-11-20T00:00:00Z",
+                     "url": f"https://x/{n}"} for n in range(dict(params)["limit"])]
+            return {"data": rows, "meta": {"total": 300}}
         if "greenhouse" in url:
             return GH_JOBS
         if "lever" in url:
@@ -40,6 +51,7 @@ def fake(monkeypatch):
         return {"payload": {"jobs": rows, "hasMore": page < 4}}
 
     monkeypatch.setattr(http, "get_json", get_json)
+    monkeypatch.setattr(http, "post_json", post_json)
     monkeypatch.setenv("TW_JOBS_BOARDS", "-g:ubiquiti,-g:canonical,-g:stripe,-g:mongodb,-g:appier,-l:pinkoi,"
                                           "-l:binance,-l:crypto,g:appier,l:x")
     return calls
@@ -118,8 +130,8 @@ def test_all_merges_round_robin_and_survives_one_failure(fake, monkeypatch):
     monkeypatch.setattr(service.workday, "search", lambda **kw: (_ for _ in ()).throw(http.SiteError("也擋住")))
     out = service.search_jobs(source="all", per_page=4)
     assert any(n.startswith("104：") for n in out["notes"]) and any(n.startswith("workday：") for n in out["notes"])
-    assert {j["id"][:2] for j in out["jobs"]} <= {"y:", "g:", "l:"}
-    assert set(out["totals"]) == {"yourator", "boards"}
+    assert {j["id"][:2] for j in out["jobs"]} <= {"y:", "c:", "f:", "g:", "l:"}
+    assert set(out["totals"]) == {"yourator", "cake", "freehire", "boards"}
     assert "yourator" in render.search(out).splitlines()[0]
 
 
@@ -158,9 +170,32 @@ def test_status_names_unreachable_sources(monkeypatch):
             raise http.SiteError("擋住")
 
     monkeypatch.setattr(http, "get_json", fake_get)
+    monkeypatch.setattr(http, "post_json", lambda *a, **k: {"data": []})
     monkeypatch.setattr(workday, "probe", probe)
     monkeypatch.setattr(service.api, "search", lambda params: {})
     monkeypatch.setenv("TW_JOBS_BOARDS", "-g:ubiquiti,-g:canonical,-g:stripe,-g:mongodb,-l:pinkoi,-l:binance,-l:crypto")
     text = render.status(service.source_status())
-    assert text.startswith("可用：104、職缺板 1 家、Workday ") and "無法連線 yourator：403 被擋" in text
+    assert text.startswith("可用：104、cake、freehire、職缺板 1 家、Workday ") and "無法連線 yourator：403 被擋" in text
     assert "無法連線 w:micron：擋住" in text and text.count("無法連線") == 2
+
+
+def test_cake_filters_are_built_from_the_tool_arguments(fake):
+    page = cake.search(keyword="後端", areas=["台北市", "新北"], page=1, per_page=20, my_years=1, remote=True)
+    url, body = next(c for c in fake if "cake" in c[0])
+    assert body["filters"]["locations"] == ["台北市, 台灣", "新北市, 台灣"]
+    assert body["filters"]["year_of_seniority"] == ["0_1", "1_3"]
+    assert body["filters"]["remote"] == ["partial_remote_work", "full_remote_work"]
+    assert body["per_page"] == cake.PAGE_SIZE and len(page["jobs"]) == 20
+    assert page["jobs"][0]["id"] == "c:co/j0" and page["jobs"][0]["salary"] == "月薪50,000~80,000"
+
+
+def test_cake_stops_at_the_five_hundred_row_ceiling(fake):
+    page = cake.search(keyword="x", areas=[], page=26, per_page=20)
+    assert page["jobs"] == [] and page["at_least"]
+
+
+def test_freehire_pages_by_hundreds_and_reads_junior_taipei(fake):
+    page = freehire.search(keyword="react", areas=["新北市"], newest=True, page=2, per_page=30, my_years=0)
+    _, params = next(c for c in fake if "freehire" in c[0])
+    assert ("metros", "Taipei (TW)") in params and ("seniority", "junior") in params and ("sort", "posted_at") in params
+    assert dict(params)["offset"] == 0 and len(page["jobs"]) == 30 and page["jobs"][0]["id"] == "f:s30"

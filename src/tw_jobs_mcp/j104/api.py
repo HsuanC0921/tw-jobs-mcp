@@ -7,7 +7,7 @@ _ROOT = "https://www.104.com.tw"
 def search(params: dict) -> dict:
     return http.get_json(
         f"{_ROOT}/jobs/search/api/jobs",
-        params={"jobsource": "joblist_search", "mode": "s", **params},
+        params=params,  # the site's own search page no longer sends jobsource or mode
         referer=f"{_ROOT}/jobs/search/",
     )
 

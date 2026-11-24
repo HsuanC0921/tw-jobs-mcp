@@ -1,18 +1,20 @@
 """The logic behind the tools. Every function returns a dict; a failure is {"error": ...}.
 
 server.py renders these dicts as compact text for the model. Ids carry their source:
-a bare id is 104, "y:" is Yourator, "g:" and "l:" are Greenhouse and Lever boards.
+a bare id is 104, "y:" is Yourator, "c:" is Cake, "f:" is freehire, "g:" and "l:" are Greenhouse and Lever boards.
 """
 from concurrent.futures import ThreadPoolExecutor
 from itertools import chain, zip_longest
 
-from . import boards, friendly, http, workday, yourator
+from . import boards, cake, freehire, friendly, http, workday, yourator
 from .http import SiteError
 from .j104 import api, codes, query, rank, shape, stats
 
-SOURCES = ("104", "yourator", "boards", "workday")
+SOURCES = ("104", "yourator", "cake", "freehire", "boards", "workday")
 # Filters a source cannot apply, by the tool's own argument names.
 _IGNORED = {
+    "cake": ("jobcat", "salary_min", "education", "job_type", "new_only"),
+    "freehire": ("jobcat", "salary_min", "education", "job_type", "remote", "new_only"),
     "yourator": ("jobcat", "salary_min", "education", "my_years", "job_type", "remote", "new_only"),
     "boards": ("jobcat", "salary_min", "education", "my_years", "job_type", "new_only"),
     "workday": ("jobcat", "salary_min", "education", "my_years", "job_type", "remote", "new_only"),
@@ -60,7 +62,11 @@ def _search_one(source: str, f: dict, per_page: int) -> tuple[dict, list[str]]:
                   page=f.get("page", 1), per_page=per_page)
     if source == "yourator":
         return yourator.search(**common), []
+    if source == "freehire":
+        return freehire.search(**common, my_years=f.get("my_years")), []
     del common["newest"]
+    if source == "cake":
+        return cake.search(**common, my_years=f.get("my_years"), remote=bool(f.get("remote"))), []
     if source == "workday":
         return workday.search(**{k: common[k] for k in ("keyword", "areas", "page", "per_page")})
     return boards.search(**common, remote=bool(f.get("remote")))
@@ -134,6 +140,10 @@ def search_jobs(*, source: str = "104", **f) -> dict:
 def _route(raw: str) -> tuple[str, str]:
     if raw.startswith("y:"):
         return "yourator", raw[2:]
+    if raw.startswith("c:"):
+        return "cake", raw[2:]
+    if raw.startswith("f:"):
+        return "freehire", raw[2:]
     if raw[:2] in ("g:", "l:"):
         return "boards", raw
     if raw.startswith("w:"):
@@ -148,7 +158,8 @@ def get_job(job_id: str, applicants: bool = False, similar: bool = False) -> dic
     source, raw = _route(job_id)
     try:
         if source != "104":
-            detail = {"yourator": yourator.job, "boards": boards.job, "workday": workday.job}[source](raw)
+            detail = {"yourator": yourator.job, "cake": cake.job, "freehire": freehire.job,
+                      "boards": boards.job, "workday": workday.job}[source](raw)
             if applicants or similar:
                 detail["note"] = "應徵者分析與相似職缺只有 104 職缺提供"
             return detail
@@ -185,7 +196,13 @@ def get_company(company_id: str, with_openings: bool = False, keyword: str = "")
             return info
         if source == "workday":
             return workday.company(raw, with_openings, keyword)
-        if source == "yourator":
+        if source == "freehire":
+            return {"error": "freehire 沒有公司頁，請改用 search_jobs(source=\"freehire\") 搜尋公司名"}
+        if source == "cake":
+            info = cake.company(raw)
+            if info is not None and with_openings:
+                info["note"] = "Cake 不提供公司職缺清單，請用 search_jobs(source=\"cake\") 搜尋"
+        elif source == "yourator":
             info = yourator.company(raw)
             if info is not None and with_openings:
                 info["note"] = "Yourator 不提供職缺清單，請用 search_jobs(source=\"yourator\") 搜尋"
@@ -227,6 +244,10 @@ def source_status() -> dict:
                 api.search(query.build(per_page=1))
             elif name == "yourator":
                 yourator.search(keyword="", areas=[], newest=False, page=1, per_page=1)
+            elif name == "cake":
+                cake.search(keyword="", areas=[], page=1, per_page=1)
+            elif name == "freehire":
+                freehire.search(keyword="", areas=[], newest=False, page=1, per_page=1)
             elif name.startswith("w:"):
                 workday.probe(name[2:])
             else:
@@ -236,7 +257,7 @@ def source_status() -> dict:
             return name, str(exc) or type(exc).__name__
 
     http.clear_cache()  # a cached answer would hide an outage
-    names = ["104", "yourator", *boards.configured(), *map("w:".__add__, workday.companies())]
+    names = ["104", "yourator", "cake", "freehire", *boards.configured(), *map("w:".__add__, workday.companies())]
     with ThreadPoolExecutor(max_workers=8) as pool:
         return {"sources": [{"name": n, "error": e} for n, e in pool.map(probe, names)]}
 

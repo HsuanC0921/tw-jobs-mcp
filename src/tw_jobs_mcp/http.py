@@ -19,14 +19,21 @@ DEFAULT_GAP = 1.0  # seconds between requests to one host, to stay polite
 HOST_GAP = {  # job-board APIs that exist to be read publicly can go faster
     "boards-api.greenhouse.io": 0.2,
     "api.lever.co": 0.2,
+    "www.104.com.tw": 2.5,  # 104 starts answering 403 after a short burst, so go slower than the default
+    "api.cake.me": 1.2,
+    "freehire.me": 0.5,
 }
 PROFILES = ("chrome", "chrome124")
-ROUNDS = 2  # a block is often momentary, so go through the profiles twice
+ROUNDS = 1  # one pass over the profiles; more retries during a block only deepen it
 RETRY_PAUSE = 2.0
 BLOCKED = {403, 429}
+COOLDOWNS = (120.0, 300.0, 900.0)  # seconds a host is left alone after repeated blocks, per consecutive block
 CACHE_TTL = float(os.environ.get("TW_JOBS_CACHE_TTL", "300"))
 CACHE_SIZE = 256
 
+_cool_lock = threading.Lock()
+_cool_until: dict[str, float] = {}
+_strikes: dict[str, int] = {}
 _pace_lock = threading.Lock()
 _next_slot: dict[str, float] = {}
 _cache_lock = threading.Lock()
@@ -40,6 +47,29 @@ class SiteError(Exception):
 def clear_cache() -> None:
     with _cache_lock:
         _cache.clear()
+    with _cool_lock:
+        _cool_until.clear()
+        _strikes.clear()
+
+
+def _check_cooling(host: str) -> None:
+    """A host that just blocked us is left alone for a while; hammering it only extends the block."""
+    with _cool_lock:
+        wait = _cool_until.get(host, 0.0) - time.monotonic()
+    if wait > 0:
+        raise SiteError(f"{host} 剛擋下請求，為避免加重限流暫停 {int(wait) + 1} 秒後再試")
+
+
+def _note_block(host: str) -> None:
+    with _cool_lock:
+        strikes = _strikes.get(host, 0)
+        _strikes[host] = strikes + 1
+        _cool_until[host] = time.monotonic() + COOLDOWNS[min(strikes, len(COOLDOWNS) - 1)]
+
+
+def _note_ok(host: str) -> None:
+    with _cool_lock:
+        _strikes.pop(host, None)
 
 
 def _recall(key: str):
@@ -87,6 +117,7 @@ def _reason(status: int) -> str:
 
 def _fetch(url: str, params, headers: dict, body=None):
     host = urlsplit(url).netloc
+    _check_cooling(host)
     failure = None
     for attempt, profile in enumerate(PROFILES * ROUNDS):
         if attempt >= len(PROFILES):
@@ -98,20 +129,23 @@ def _fetch(url: str, params, headers: dict, body=None):
             failure = SiteError(f"連線失敗：{exc}")
             continue
         if resp.status_code == 200:
+            _note_ok(host)
             return resp
         failure = SiteError(_reason(resp.status_code))
         if resp.status_code not in BLOCKED:
             raise failure  # another fingerprint only helps against a block
+    _note_block(host)
     raise failure
 
 
-def _cached(kind: str, url: str, params, referer: str | None, accept: str, parse, body=None):
+def _cached(kind: str, url: str, params, referer: str | None, accept: str, parse, body=None, extra=None):
     key = json.dumps([kind, url, params, body], sort_keys=True, default=str)
     if (hit := _recall(key)) is not None:
         return hit
     headers = {"Accept": accept, "Accept-Language": "zh-TW,zh;q=0.9"}
     if referer:
         headers["Referer"] = referer
+    headers.update(extra or {})
     value = parse(_fetch(url, params, headers, body))
     _remember(key, value)
     return value
@@ -124,12 +158,12 @@ def _json_body(resp) -> dict:
         raise SiteError("網站回傳的內容不是 JSON") from exc
 
 
-def get_json(url: str, *, referer: str | None = None, params=None):
-    return _cached("json", url, params, referer, "application/json, text/plain, */*", _json_body)
+def get_json(url: str, *, referer: str | None = None, params=None, headers: dict | None = None):
+    return _cached("json", url, params, referer, "application/json, text/plain, */*", _json_body, extra=headers)
 
 
-def post_json(url: str, body: dict, *, referer: str | None = None):
-    return _cached("post", url, None, referer, "application/json", _json_body, body)
+def post_json(url: str, body: dict, *, referer: str | None = None, headers: dict | None = None):
+    return _cached("post", url, None, referer, "application/json", _json_body, body, extra=headers)
 
 
 def get_text(url: str, *, referer: str | None = None, params=None) -> str:

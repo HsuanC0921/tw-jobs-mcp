@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0
+
+- New sources `cake` (Cake, 50 rows a page, up to 10 pages) and `freehire` (aggregated career sites and LinkedIn, 100 rows a call). Both reach their APIs without a browser and keep working when 104 answers 403. Ids `c:` and `f:`. 新增 Cake 與 freehire 來源，104 被擋時仍可用。
+- Blocked hosts now cool down instead of being retried in a burst, requests to one host are paced, and a blocked request gets one retry pass. 被擋的來源會冷卻，不再連續重試。
+- README no longer lists Cake as unreachable. README 不再把 Cake 列為不可用。
+
 ## 1.2.1
 
 - `search_jobs(include_negotiable=true)`: with `salary_min`, also list 面議 postings. 104 leaves them out once a pay floor is set, which hid most of the finance industry; a note now says so. 新增 `include_negotiable`，設薪資下限時可連面議職缺一起列，並在結果註記提醒。

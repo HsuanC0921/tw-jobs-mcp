@@ -5,7 +5,7 @@
 | Argument | Notes |
 |---|---|
 | `keyword`, `keyword_en` | Chinese for 104, English for the other sources. If only one is given, every source uses it. 1 to 3 short words each; no places, no pay. |
-| `source` | `104` (default), `yourator`, `boards`, `workday`, `all` |
+| `source` | `104` (default), `yourator`, `cake`, `freehire`, `boards`, `workday`, `all` |
 | `area` | Chinese place names. A bare city (`新北`) means the city; a name matching a few places (`新竹`, `中山區`) is widened to all of them, noted under the results. |
 | `jobcat` | 104 job categories by Chinese name (`軟體工程師`). A name that cannot be matched becomes a keyword. `lookup_code` browses the tree. |
 | `salary_min`, `salary_unit` | Floor, in the unit stated. 104 applies it on the server. Other sources ignore it and say so. 104 leaves out 面議 postings when a floor is set. |
