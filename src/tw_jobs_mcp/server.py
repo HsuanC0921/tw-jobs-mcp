@@ -64,9 +64,9 @@ def search_jobs(
 ) -> str:
     """搜尋職缺，回傳表格（id 給 get_job，company_id 給 get_company）。
 keyword 中文（給 104）、keyword_en 英文（給其他來源），互為翻譯；只填一個時兩邊共用。
-非 104 來源只支援 keyword、area（yourator、freehire 可 sort=newest，cake 可 my_years、remote_only，boards 可 remote_only），其餘條件會在註記說明未套用。
+非 104 來源只支援 keyword、area（yourator、freehire 可 sort=newest，cake 可 my_years、remote_only，boards 可 remote_only），其餘會在註記說明。
 area/jobcat 填中文名稱（台北市、軟體工程師）。salary_min 的單位是 salary_unit，104 預設不含面議，include_negotiable=True 才納入。
-my_years＝使用者的年資，列出要求不超過它的（含經驗不拘）。per_page≤30，用 page 翻頁。"""
+my_years＝使用者的年資，列出要求不超過它的（含經驗不拘）。per_page≤30，page 翻頁。"""
     result = service.search_jobs(
         keyword=keyword, keyword_en=keyword_en, source=source, salary_min=salary_min, salary_unit=salary_unit,
         include_negotiable=include_negotiable, area=area or (),

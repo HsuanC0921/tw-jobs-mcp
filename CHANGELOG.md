@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.1
+
+- Shorter tool descriptions so the tool listing stays within its size budget on Python 3.11. 縮短工具說明，讓 Python 3.11 下的工具清單維持在大小預算內。
+
 ## 1.3.0
 
 - New sources `cake` (Cake, 50 rows a page, up to 10 pages) and `freehire` (aggregated career sites and LinkedIn, 100 rows a call). Both reach their APIs without a browser and keep working when 104 answers 403. Ids `c:` and `f:`. 新增 Cake 與 freehire 來源，104 被擋時仍可用。
