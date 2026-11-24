@@ -26,8 +26,8 @@ async def _inspect(session: ClientSession) -> None:
     assert bad.isError  # the schema lists the valid values, so a wrong one never reaches the server
     result = await session.call_tool("lookup_code", {"kind": "area", "name": "大安"})
     assert "台北市大安區" in result.content[0].text
-    result = await session.call_tool("search_jobs", {"per_page": 99})
-    assert "per_page" in result.content[0].text  # validation error, no request sent
+    result = await session.call_tool("lookup_code", {"kind": "jobcat", "name": "不存在的職類xyz"})
+    assert "無符合項目" in result.content[0].text  # answered locally, no request sent
 
 
 def test_stdio_transport():
