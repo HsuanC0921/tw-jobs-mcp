@@ -15,7 +15,7 @@ from . import __version__, render, service
 
 INSTRUCTIONS = (
     "台灣求職查詢（唯讀）。你負責把使用者的白話需求轉成精確參數，不要把原句當關鍵字。\n"
-    "來源：104 最大、條件最完整（中文）；yourator 新創與外商據點；cake 本土與外商（104 被擋時首選）；freehire 彙整各家官網與 LinkedIn；boards、workday 是外商官網職缺（英文，只支援 keyword 與 area）；all 全部合併。外商、英文、稀有缺用 all。\n"
+    "來源：104 最大、條件最完整（中文）；yourator 新創與外商據點；cake 本土與外商；freehire 彙整各家官網與 LinkedIn；boards、workday 是外商官網職缺（英文，只支援 keyword 與 area）；all 全部合併。外商、英文、稀有缺用 all。\n"
     "關鍵字：職稱或技能各準備中文（keyword，給 104）與英文（keyword_en，給其他來源）兩種常用說法，互為翻譯，1~3 個短詞，不放地區與薪資。\n"
     "條件：填成使用者真正的限制，單位自行換算（年薪百萬 → salary_min=1000000, salary_unit=年薪）。\n"
     "結果下方的「註」是伺服器做的假設或放寬，請轉告使用者；無結果時先看註再自行調整。總筆數遠多於一頁時，說明只看了這一頁，需要再用 page 翻。流程 search_jobs → get_job → get_company，id 原樣傳入。連不上時呼叫 sources。"
